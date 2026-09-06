@@ -107,24 +107,16 @@
 
   <h1>Localizador Messier (M1 - M110)</h1>
 
-  <!-- Activación de sensores -->
+  <!-- Activación de Sensores y Audio -->
   <div class="card" id="initPanel">
-    <button id="btnInit">1. Activar Sensor y Audio</button>
+    <button id="btnInit">Activar Sensor y Audio</button>
     <div id="gpsStatus" class="readout" style="margin-top:6px;">GPS: Esperando activación...</div>
   </div>
 
-  <!-- Selección de objeto y orientación física -->
+  <!-- Selección de objeto Messier con nombre -->
   <div class="card">
     <label for="messierSelect">Selecciona Objeto Messier:</label>
     <select id="messierSelect"></select>
-
-    <div style="margin-top: 10px; text-align: left;">
-      <label for="mountMode">Orientación física del móvil en el soporte:</label>
-      <select id="mountMode" style="font-size: 13px; padding: 6px;">
-        <option value="perpendicular">Móvil de canto / vertical (Corrige desfase de 90°)</option>
-        <option value="flat">Móvil plano sobre el lomo del tubo</option>
-      </select>
-    </div>
   </div>
 
   <!-- Coordenadas calculadas en vivo -->
@@ -271,7 +263,7 @@
 
     let userLat = 37.18;
     let userLon = -5.78;
-    let rawPhoneBeta = 0;
+    let phoneAlt = 0;
     let audioCtx = null;
     let lastBeepTime = 0;
 
@@ -326,7 +318,7 @@
       }
 
       window.addEventListener('deviceorientation', e => {
-        rawPhoneBeta = e.beta || 0;
+        phoneAlt = e.beta || 0; // Lectura directa del ángulo de inclinación vertical
       });
 
       document.getElementById('initPanel').style.display = 'none';
@@ -344,13 +336,9 @@
       const targetAlt = hor.altitude;
       const targetAz = hor.azimuth;
 
-      // Conversión de elevación según el montaje seleccionado
-      const mode = document.getElementById('mountMode').value;
-      const calculatedPhoneAlt = (mode === 'perpendicular') ? (90 - rawPhoneBeta) : rawPhoneBeta;
-
       document.getElementById('targetAz').innerText = `${targetAz.toFixed(1)}°`;
       document.getElementById('targetAlt').innerText = `${targetAlt.toFixed(1)}°`;
-      document.getElementById('currentAlt').innerText = `${calculatedPhoneAlt.toFixed(1)}°`;
+      document.getElementById('currentAlt').innerText = `${phoneAlt.toFixed(1)}°`;
 
       const altEl = document.getElementById('altIndicator');
 
@@ -360,7 +348,7 @@
         return;
       }
 
-      const dAlt = targetAlt - calculatedPhoneAlt;
+      const dAlt = targetAlt - phoneAlt;
       const absDAlt = Math.abs(dAlt);
 
       if (absDAlt < 1.0) {
@@ -374,7 +362,7 @@
         altEl.className = "indicator";
       }
 
-      // Audio continuo (< 1°) o pulsos progresivos (< 8°)
+      // Pitidos en elevación
       const t = performance.now();
       if (absDAlt < 1.0) {
         if (t - lastBeepTime > 140) {
