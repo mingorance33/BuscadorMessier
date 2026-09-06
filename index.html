@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscador Messier - Push-To</title>
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      font-family: system-ui, -apple-system, sans-serif;
+      text-align: center;
+      padding: 18px;
+      margin: 0;
+    }
+    h2 { margin: 8px 0; color: #38bdf8; }
+    select, button {
+      padding: 10px 14px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+    .panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px auto;
+      max-width: 360px;
+    }
+    .indicator {
+      font-size: 26px;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .up-down { background: #1e293b; color: #fbbf24; }
+    .aligned { background: #064e3b !important; color: #34d399 !important; }
+    .status { font-size: 13px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <h2>Localizador Messier</h2>
+  <button id="btnStart">1. Activar Sensores y GPS</button>
+
+  <div class="panel">
+    <label for="messierSelect">Selecciona Objeto:</label><br><br>
+    <select id="messierSelect">
+      <option value="M31">M31 - Galaxia de Andrómeda</option>
+      <option value="M42">M42 - Nebulosa de Orión</option>
+      <option value="M13">M13 - Cúmulo de Hércules</option>
+      <option value="M45">M45 - Pléyades</option>
+      <option value="M57">M57 - Nebulosa del Anillo</option>
+    </select>
+
+    <div class="status" id="gpsStatus">GPS: Esperando activación...</div>
+  </div>
+
+  <div class="panel">
+    <div class="status" id="targetReadout">Objetivo: --</div>
+    <div class="status" id="currentReadout">Móvil: Alt: --° | Az: --°</div>
+
+    <!-- Indicador de elevación vertical -->
+    <div class="indicator up-down" id="altIndicator">INCLINACIÓN: --</div>
+
+    <!-- Indicador de giro horizontal -->
+    <div class="indicator up-down" id="azIndicator" style="margin-top:8px;">GIRO: --</div>
+  </div>
+
+  <script>
+    // Coordenadas ecuatorianas J2000 (RA en horas decimales, Dec en grados decimales)
+    const catalog = {
+      "M31": { ra: 0.712, dec: 41.27 },
+      "M42": { ra: 5.588, dec: -5.39 },
+      "M13": { ra: 16.695, dec: 36.46 },
+      "M45": { ra: 3.79, dec: 24.11 },
+      "M57": { ra: 18.893, dec: 33.03 }
+    };
+
+    let userLat = 37.18; // Utrera (fallback)
+    let userLon = -5.78;
+    let currentPhoneAlt = 0;
+    let currentPhoneAz = 0;
+
+    // 1. Permisos y activación de sensores
+    document.getElementById('btnStart').addEventListener('click', async () => {
+      // Activar GPS
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          pos => {
+            userLat = pos.coords.latitude;
+            userLon = pos.coords.longitude;
+            document.getElementById('gpsStatus').innerText = 
+              `GPS OK: Lat ${userLat.toFixed(2)}°, Lon ${userLon.toFixed(2)}°`;
+          },
+          err => { document.getElementById('gpsStatus').innerText = 'GPS manual activo'; },
+          { enableHighAccuracy: true }
+        );
+      }
+
+      // Permiso de orientación (necesario en iOS 13+)
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const perm = await DeviceOrientationEvent.requestPermission();
+        if (perm !== 'granted') return alert('Permiso denegado para sensores');
+      }
+
+      window.addEventListener('deviceorientation', handleOrientation);
+      document.getElementById('btnStart').style.display = 'none';
+      setInterval(updateTracking, 200); // Refresco a 5 Hz
+    });
+
+    function handleOrientation(e) {
+      // Elevación vertical (beta corresponde a la inclinación si se mira la pantalla de canto)
+      currentPhoneAlt = e.beta || 0;
+
+      // Azimut / Brújula
+      if (e.webkitCompassHeading) {
+        currentPhoneAz = e.webkitCompassHeading; // iOS (Norte = 0°)
+      } else if (e.alpha !== null) {
+        currentPhoneAz = (360 - e.alpha) % 360;   // Android estándar
+      }
+    }
+
+    function updateTracking() {
+      const selected = document.getElementById('messierSelect').value;
+      const targetObj = catalog[selected];
+
+      // Conversión astronómica en tiempo real
+      const observer = new Astronomy.Observer(userLat, userLon, 0);
+      const hor = Astronomy.Horizon(new Date(), observer, targetObj.ra, targetObj.dec, 'normal');
+
+      const targetAlt = hor.altitude;
+      const targetAz = hor.azimuth;
+
+      document.getElementById('targetReadout').innerText = 
+        `Objetivo: Alt ${targetAlt.toFixed(1)}° | Az ${targetAz.toFixed(1)}°`;
+      document.getElementById('currentReadout').innerText = 
+        `Móvil: Alt ${currentPhoneAlt.toFixed(1)}° | Az ${currentPhoneAz.toFixed(1)}°`;
+
+      // Diferencia en Altitud (Subir / Bajar)
+      const dAlt = targetAlt - currentPhoneAlt;
+      const altEl = document.getElementById('altIndicator');
+
+      if (Math.abs(dAlt) < 1.0) {
+        altEl.innerText = "ALTITUD CENTRADA ✓";
+        altEl.classList.add('aligned');
+      } else if (dAlt > 0) {
+        altEl.innerText = `SUBE ↑ (+${dAlt.toFixed(1)}°)`;
+        altEl.classList.remove('aligned');
+      } else {
+        altEl.innerText = `BAJA ↓ (${dAlt.toFixed(1)}°)`;
+        altEl.classList.remove('aligned');
+      }
+
+      // Diferencia en Azimut (Giro horizontal)
+      let dAz = (targetAz - currentPhoneAz + 540) % 360 - 180;
+      const azEl = document.getElementById('azIndicator');
+
+      if (Math.abs(dAz) < 1.5) {
+        azEl.innerText = "AZIMUT CENTRADO ✓";
+        azEl.classList.add('aligned');
+      } else if (dAz > 0) {
+        azEl.innerText = `GIRA DERECHA → (+${dAz.toFixed(1)}°)`;
+        azEl.classList.remove('aligned');
+      } else {
+        azEl.innerText = `GIRA IZQUIERDA ← (${dAz.toFixed(1)}°)`;
+        azEl.classList.remove('aligned');
+      }
+    }
+  </script>
+</body>
+</html>
