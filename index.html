@@ -2,175 +2,303 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buscador Messier - Push-To</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Buscador Messier - Coordenadas y Elevación</title>
   <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
   <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131d31;
+      --border: #334155;
+      --accent: #38bdf8;
+      --green: #00e676;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+    }
     body {
-      background-color: #0b0f19;
-      color: #f1f5f9;
-      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       text-align: center;
-      padding: 18px;
+      padding: 14px;
       margin: 0;
+      box-sizing: border-box;
     }
-    h2 { margin: 8px 0; color: #38bdf8; }
-    select, button {
-      padding: 10px 14px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #fff;
-      margin-bottom: 15px;
-    }
-    .panel {
-      background: #111827;
-      border: 1px solid #1f2937;
+    h1 { font-size: 20px; color: var(--accent); margin: 6px 0 14px 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 16px;
-      margin: 12px auto;
-      max-width: 360px;
+      padding: 14px;
+      margin-bottom: 12px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    label { font-size: 13px; color: var(--subtext); display: block; margin-bottom: 6px; }
+    select, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #090d16;
+      color: var(--text);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      margin-top: 6px;
+    }
+    .coords-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .coord-box {
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 6px;
+    }
+    .coord-box .title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--subtext);
+      margin-bottom: 4px;
+    }
+    .coord-box .val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .readout {
+      font-size: 13px;
+      color: var(--subtext);
+      margin: 6px 0;
     }
     .indicator {
-      font-size: 26px;
-      font-weight: 700;
-      padding: 14px;
+      font-size: 22px;
+      font-weight: 800;
+      padding: 16px;
       border-radius: 8px;
-      margin-top: 10px;
+      margin-top: 8px;
+      background: #1e293b;
+      color: #fbbf24;
+      transition: background 0.15s, color 0.15s;
     }
-    .up-down { background: #1e293b; color: #fbbf24; }
-    .aligned { background: #064e3b !important; color: #34d399 !important; }
-    .status { font-size: 13px; color: #94a3b8; }
+    .indicator.aligned {
+      background: #064e3b !important;
+      color: var(--green) !important;
+    }
+    .indicator.below {
+      background: #3b0764 !important;
+      color: #d8b4fe !important;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Localizador Messier</h2>
-  <button id="btnStart">1. Activar Sensores y GPS</button>
+  <h1>Localizador Messier (M1 - M110)</h1>
 
-  <div class="panel">
-    <label for="messierSelect">Selecciona Objeto:</label><br><br>
-    <select id="messierSelect">
-      <option value="M31">M31 - Galaxia de Andrómeda</option>
-      <option value="M42">M42 - Nebulosa de Orión</option>
-      <option value="M13">M13 - Cúmulo de Hércules</option>
-      <option value="M45">M45 - Pléyades</option>
-      <option value="M57">M57 - Nebulosa del Anillo</option>
-    </select>
-
-    <div class="status" id="gpsStatus">GPS: Esperando activación...</div>
+  <!-- Panel de activación obligatoria para Audio Context y Sensores -->
+  <div class="card" id="initPanel">
+    <button id="btnInit">Activar Sensor de Inclinación y Audio</button>
+    <div id="gpsStatus" class="readout" style="margin-top:8px;">GPS: Esperando activación...</div>
   </div>
 
-  <div class="panel">
-    <div class="status" id="targetReadout">Objetivo: --</div>
-    <div class="status" id="currentReadout">Móvil: Alt: --° | Az: --°</div>
+  <!-- Selector de objeto Messier -->
+  <div class="card">
+    <label for="messierSelect">Selecciona Objeto Messier:</label>
+    <select id="messierSelect"></select>
+  </div>
 
-    <!-- Indicador de elevación vertical -->
-    <div class="indicator up-down" id="altIndicator">INCLINACIÓN: --</div>
+  <!-- Coordenadas calculadas en vivo para apuntar con la brújula -->
+  <div class="card">
+    <label>COORDENADAS EN VIVO DEL OBJETO</label>
+    <div class="coords-grid">
+      <div class="coord-box">
+        <div class="title">Rumbo Brújula (Azimut)</div>
+        <div class="val" id="targetAz">--°</div>
+      </div>
+      <div class="coord-box">
+        <div class="title">Ángulo Vertical (Altitud)</div>
+        <div class="val" id="targetAlt">--°</div>
+      </div>
+    </div>
+    <div class="readout">Inclinación actual del móvil: <strong id="currentAlt" style="color:var(--text);">--°</strong></div>
 
-    <!-- Indicador de giro horizontal -->
-    <div class="indicator up-down" id="azIndicator" style="margin-top:8px;">GIRO: --</div>
+    <!-- Indicador de acción vertical con el sensor del móvil -->
+    <div class="indicator" id="altIndicator">INCLINA EL MÓVIL</div>
   </div>
 
   <script>
-    // Coordenadas ecuatorianas J2000 (RA en horas decimales, Dec en grados decimales)
-    const catalog = {
-      "M31": { ra: 0.712, dec: 41.27 },
-      "M42": { ra: 5.588, dec: -5.39 },
-      "M13": { ra: 16.695, dec: 36.46 },
-      "M45": { ra: 3.79, dec: 24.11 },
-      "M57": { ra: 18.893, dec: 33.03 }
+    // Catálogo Messier J2000 completo (RA en horas decimales, Dec en grados decimales)
+    const MESSIER = {
+      "M1": [5.575, 22.01], "M2": [21.558, -0.82], "M3": [13.703, 28.38], "M4": [16.393, -26.53],
+      "M5": [15.31, 2.08], "M6": [17.668, -32.22], "M7": [17.898, -34.82], "M8": [18.06, -24.38],
+      "M9": [17.32, -18.52], "M10": [16.952, -4.1], "M11": [18.852, -6.27], "M12": [16.787, -1.95],
+      "M13": [16.695, 36.46], "M14": [17.627, -3.25], "M15": [21.5, 12.17], "M16": [18.313, -13.8],
+      "M17": [18.347, -16.18], "M18": [18.332, -17.13], "M19": [17.043, -26.27], "M20": [18.043, -23.03],
+      "M21": [18.077, -22.5], "M22": [18.607, -23.9], "M23": [17.948, -19.02], "M24": [18.28, -18.55],
+      "M25": [18.527, -19.12], "M26": [18.753, -9.4], "M27": [19.993, 22.72], "M28": [18.408, -24.87],
+      "M29": [20.398, 38.53], "M30": [21.678, -23.18], "M31": [0.712, 41.27], "M32": [0.712, 40.87],
+      "M33": [1.564, 30.65], "M34": [2.702, 42.78], "M35": [6.148, 24.33], "M36": [5.602, 34.13],
+      "M37": [5.873, 32.55], "M38": [5.478, 35.85], "M39": [21.537, 48.43], "M40": [12.373, 58.08],
+      "M41": [6.783, -20.73], "M42": [5.588, -5.39], "M43": [5.592, -5.27], "M44": [8.672, 19.68],
+      "M45": [3.79, 24.11], "M46": [7.697, -14.82], "M47": [7.61, -14.48], "M48": [8.23, -5.8],
+      "M49": [12.497, 8.0], "M50": [7.053, -8.37], "M51": [13.498, 47.2], "M52": [23.403, 61.58],
+      "M53": [13.215, 18.17], "M54": [18.918, -30.48], "M55": [19.667, -30.96], "M56": [19.277, 30.18],
+      "M57": [18.893, 33.03], "M58": [12.628, 11.82], "M59": [12.7, 11.65], "M60": [12.728, 11.55],
+      "M61": [12.365, 4.47], "M62": [17.02, -30.11], "M63": [13.263, 42.03], "M64": [12.945, 21.68],
+      "M65": [11.315, 13.09], "M66": [11.337, 12.99], "M67": [8.847, 11.82], "M68": [12.657, -26.75],
+      "M69": [18.523, -32.35], "M70": [18.722, -32.3], "M71": [19.897, 18.78], "M72": [20.892, -12.54],
+      "M73": [20.983, -12.63], "M74": [1.612, 15.78], "M75": [20.102, -21.92], "M76": [1.705, 51.57],
+      "M77": [2.712, -0.01], "M78": [5.778, 0.05], "M79": [5.402, -24.52], "M80": [16.283, -22.97],
+      "M81": [9.927, 69.07], "M82": [9.93, 69.68], "M83": [13.617, -29.61], "M84": [12.418, 12.9],
+      "M85": [12.423, 18.19], "M86": [12.435, 12.95], "M87": [12.513, 12.4], "M88": [12.533, 14.42],
+      "M89": [12.593, 12.56], "M90": [12.613, 13.16], "M91": [12.59, 14.5], "M92": [17.285, 43.14],
+      "M93": [7.743, -23.85], "M94": [12.848, 41.12], "M95": [10.733, 11.7], "M96": [10.778, 11.82],
+      "M97": [11.247, 55.02], "M98": [12.23, 14.9], "M99": [12.313, 14.42], "M100": [12.382, 15.82],
+      "M101": [14.053, 54.35], "M102": [15.11, 55.76], "M103": [1.555, 60.7], "M104": [12.667, -11.62],
+      "M105": [10.797, 12.58], "M106": [12.317, 47.3], "M107": [16.542, -13.05], "M108": [11.192, 55.67],
+      "M109": [11.96, 53.37], "M110": [0.673, 41.69]
     };
 
-    let userLat = 37.18; // Utrera (fallback)
+    // Llenar selector
+    const selectEl = document.getElementById('messierSelect');
+    Object.keys(MESSIER).forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = id;
+      selectEl.appendChild(opt);
+    });
+
+    let userLat = 37.18; // Utrera (fallback predeterminado)
     let userLon = -5.78;
     let currentPhoneAlt = 0;
-    let currentPhoneAz = 0;
+    let audioCtx = null;
+    let lastBeepTime = 0;
 
-    // 1. Permisos y activación de sensores
-    document.getElementById('btnStart').addEventListener('click', async () => {
-      // Activar GPS
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playBeep(freq, durMs) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (durMs / 1000));
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + (durMs / 1000));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    document.getElementById('btnInit').addEventListener('click', async () => {
+      initAudio();
+
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
-          pos => {
-            userLat = pos.coords.latitude;
-            userLon = pos.coords.longitude;
+          p => {
+            userLat = p.coords.latitude;
+            userLon = p.coords.longitude;
             document.getElementById('gpsStatus').innerText = 
               `GPS OK: Lat ${userLat.toFixed(2)}°, Lon ${userLon.toFixed(2)}°`;
           },
-          err => { document.getElementById('gpsStatus').innerText = 'GPS manual activo'; },
+          () => { document.getElementById('gpsStatus').innerText = 'GPS manual activo (37.18°, -5.78°)'; },
           { enableHighAccuracy: true }
         );
       }
 
-      // Permiso de orientación (necesario en iOS 13+)
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         const perm = await DeviceOrientationEvent.requestPermission();
-        if (perm !== 'granted') return alert('Permiso denegado para sensores');
+        if (perm !== 'granted') return alert('Permiso de inclinación denegado');
       }
 
-      window.addEventListener('deviceorientation', handleOrientation);
-      document.getElementById('btnStart').style.display = 'none';
-      setInterval(updateTracking, 200); // Refresco a 5 Hz
+      window.addEventListener('deviceorientation', e => {
+        currentPhoneAlt = e.beta || 0; // Lectura de elevación del móvil
+      });
+
+      document.getElementById('initPanel').style.display = 'none';
+      setInterval(tick, 100);
     });
 
-    function handleOrientation(e) {
-      // Elevación vertical (beta corresponde a la inclinación si se mira la pantalla de canto)
-      currentPhoneAlt = e.beta || 0;
+    function tick() {
+      const id = selectEl.value;
+      const [ra, dec] = MESSIER[id];
+      const now = new Date();
 
-      // Azimut / Brújula
-      if (e.webkitCompassHeading) {
-        currentPhoneAz = e.webkitCompassHeading; // iOS (Norte = 0°)
-      } else if (e.alpha !== null) {
-        currentPhoneAz = (360 - e.alpha) % 360;   // Android estándar
-      }
-    }
-
-    function updateTracking() {
-      const selected = document.getElementById('messierSelect').value;
-      const targetObj = catalog[selected];
-
-      // Conversión astronómica en tiempo real
-      const observer = new Astronomy.Observer(userLat, userLon, 0);
-      const hor = Astronomy.Horizon(new Date(), observer, targetObj.ra, targetObj.dec, 'normal');
+      // Transformación a coordenadas locales de observación
+      const obs = new Astronomy.Observer(userLat, userLon, 0);
+      const hor = Astronomy.Horizon(now, obs, ra, dec, 'normal');
 
       const targetAlt = hor.altitude;
       const targetAz = hor.azimuth;
 
-      document.getElementById('targetReadout').innerText = 
-        `Objetivo: Alt ${targetAlt.toFixed(1)}° | Az ${targetAz.toFixed(1)}°`;
-      document.getElementById('currentReadout').innerText = 
-        `Móvil: Alt ${currentPhoneAlt.toFixed(1)}° | Az ${currentPhoneAz.toFixed(1)}°`;
+      // Actualizar los valores numéricos grandes del objeto
+      document.getElementById('targetAz').innerText = `${targetAz.toFixed(1)}°`;
+      document.getElementById('targetAlt').innerText = `${targetAlt.toFixed(1)}°`;
+      document.getElementById('currentAlt').innerText = `${currentPhoneAlt.toFixed(1)}°`;
 
-      // Diferencia en Altitud (Subir / Bajar)
-      const dAlt = targetAlt - currentPhoneAlt;
       const altEl = document.getElementById('altIndicator');
 
-      if (Math.abs(dAlt) < 1.0) {
-        altEl.innerText = "ALTITUD CENTRADA ✓";
-        altEl.classList.add('aligned');
-      } else if (dAlt > 0) {
-        altEl.innerText = `SUBE ↑ (+${dAlt.toFixed(1)}°)`;
-        altEl.classList.remove('aligned');
-      } else {
-        altEl.innerText = `BAJA ↓ (${dAlt.toFixed(1)}°)`;
-        altEl.classList.remove('aligned');
+      if (targetAlt < 0) {
+        altEl.innerText = "BAJO EL HORIZONTE";
+        altEl.className = "indicator below";
+        return;
       }
 
-      // Diferencia en Azimut (Giro horizontal)
-      let dAz = (targetAz - currentPhoneAz + 540) % 360 - 180;
-      const azEl = document.getElementById('azIndicator');
+      const dAlt = targetAlt - currentPhoneAlt;
+      const absDAlt = Math.abs(dAlt);
 
-      if (Math.abs(dAz) < 1.5) {
-        azEl.innerText = "AZIMUT CENTRADO ✓";
-        azEl.classList.add('aligned');
-      } else if (dAz > 0) {
-        azEl.innerText = `GIRA DERECHA → (+${dAz.toFixed(1)}°)`;
-        azEl.classList.remove('aligned');
+      // Evaluación del ángulo vertical con retroalimentación visual y de sonido
+      if (absDAlt < 1.0) {
+        altEl.innerText = "¡ELEVACIÓN CENTRADA! ✓";
+        altEl.className = "indicator aligned";
+      } else if (dAlt > 0) {
+        altEl.innerText = `SUBE ↑ (+${dAlt.toFixed(1)}°)`;
+        altEl.className = "indicator";
       } else {
-        azEl.innerText = `GIRA IZQUIERDA ← (${dAz.toFixed(1)}°)`;
-        azEl.classList.remove('aligned');
+        altEl.innerText = `BAJA ↓ (${dAlt.toFixed(1)}°)`;
+        altEl.className = "indicator";
+      }
+
+      // Pitidos en elevación
+      const t = performance.now();
+      if (absDAlt < 1.0) {
+        if (t - lastBeepTime > 140) {
+          playBeep(880, 130); // Tono continuo agudo
+          lastBeepTime = t;
+        }
+      } else if (absDAlt < 8.0) {
+        const interval = 120 + (absDAlt / 8.0) * 550; // Acelera conforme te acercas
+        if (t - lastBeepTime > interval) {
+          playBeep(520, 60);
+          lastBeepTime = t;
+        }
       }
     }
   </script>
