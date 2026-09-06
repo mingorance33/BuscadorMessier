@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Buscador Messier - Nombres y Calibración</title>
+  <title>Buscador Catálogo Messier</title>
   <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
   <style>
     :root {
@@ -53,13 +53,6 @@
       cursor: pointer;
       border: none;
       margin-top: 5px;
-    }
-    .btn-secondary {
-      background: #1e293b;
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-size: 13px;
-      padding: 7px;
     }
     .coords-grid {
       display: grid;
@@ -114,29 +107,27 @@
 
   <h1>Localizador Messier (M1 - M110)</h1>
 
-  <!-- Panel de inicio -->
+  <!-- Activación de sensores -->
   <div class="card" id="initPanel">
     <button id="btnInit">1. Activar Sensor y Audio</button>
     <div id="gpsStatus" class="readout" style="margin-top:6px;">GPS: Esperando activación...</div>
   </div>
 
-  <!-- Selección de objeto con Nombre común -->
+  <!-- Selección de objeto y orientación física -->
   <div class="card">
     <label for="messierSelect">Selecciona Objeto Messier:</label>
     <select id="messierSelect"></select>
 
-    <!-- Configuración del montaje para corregir el ángulo de 90° -->
     <div style="margin-top: 10px; text-align: left;">
-      <label for="mountMode">Posición física del móvil en el telescopio:</label>
+      <label for="mountMode">Orientación física del móvil en el soporte:</label>
       <select id="mountMode" style="font-size: 13px; padding: 6px;">
-        <option value="perpendicular">Móvil de canto / vertical (Corrige desfase 90°)</option>
-        <option value="flat">Móvil plano tumbado sobre el lomo del tubo</option>
+        <option value="perpendicular">Móvil de canto / vertical (Corrige desfase de 90°)</option>
+        <option value="flat">Móvil plano sobre el lomo del tubo</option>
       </select>
-      <button id="btnZero" class="btn-secondary" style="margin-top: 6px;">Calibrar 0° en posición actual</button>
     </div>
   </div>
 
-  <!-- Panel de coordenadas del objeto -->
+  <!-- Coordenadas calculadas en vivo -->
   <div class="card">
     <label style="text-align:center;">COORDENADAS EN VIVO DEL OBJETO</label>
     <div class="coords-grid">
@@ -150,12 +141,12 @@
       </div>
     </div>
 
-    <div class="readout">Elevación actual del tubo/móvil: <strong id="currentAlt" style="color:var(--text);">--°</strong></div>
+    <div class="readout">Elevación actual del sensor: <strong id="currentAlt" style="color:var(--text);">--°</strong></div>
     <div class="indicator" id="altIndicator">INCLINA EL TUBO</div>
   </div>
 
   <script>
-    // Catálogo Messier J2000 con nombres comunes/populares [RA, Dec, Nombre]
+    // Catálogo Messier J2000 [RA (horas), Dec (grados), Nombre común]
     const MESSIER = {
       "M1": [5.575, 22.01, "Nebulosa del Cangrejo"],
       "M2": [21.558, -0.82, "Cúmulo globular en Acuario"],
@@ -166,110 +157,109 @@
       "M7": [17.898, -34.82, "Cúmulo de Ptolomeo"],
       "M8": [18.06, -24.38, "Nebulosa de la Laguna"],
       "M9": [17.32, -18.52, "Cúmulo globular en Ofiuco"],
-      "M10": [16.952, -4.1, "Cúmulo globular brillante en Ofiuco"],
+      "M10": [16.952, -4.1, "Cúmulo globular en Ofiuco"],
       "M11": [18.852, -6.27, "Cúmulo del Pato Salvaje"],
-      "M12": [16.787, -1.95, "Cúmulo globular disperso en Ofiuco"],
+      "M12": [16.787, -1.95, "Cúmulo globular en Ofiuco"],
       "M13": [16.695, 36.46, "Gran Cúmulo de Hércules"],
       "M14": [17.627, -3.25, "Cúmulo globular en Ofiuco"],
       "M15": [21.5, 12.17, "Cúmulo de Pegaso"],
-      "M16": [18.313, -13.8, "Nebulosa del Águila (Pilares)"],
+      "M16": [18.313, -13.8, "Nebulosa del Águila"],
       "M17": [18.347, -16.18, "Nebulosa Omega / Cisne"],
       "M18": [18.332, -17.13, "Cúmulo abierto en Sagitario"],
       "M19": [17.043, -26.27, "Cúmulo globular ovalado en Ofiuco"],
       "M20": [18.043, -23.03, "Nebulosa Trífida"],
       "M21": [18.077, -22.5, "Cúmulo abierto en Sagitario"],
       "M22": [18.607, -23.9, "Gran Cúmulo de Sagitario"],
-      "M23": [17.948, -19.02, "Cúmulo abierto extenso en Sagitario"],
+      "M23": [17.948, -19.02, "Cúmulo abierto en Sagitario"],
       "M24": [18.28, -18.55, "Nube estelar de Sagitario"],
       "M25": [18.527, -19.12, "Cúmulo abierto IC 4725"],
       "M26": [18.753, -9.4, "Cúmulo abierto en Scutum"],
-      "M27": [19.993, 22.72, "Nebulosa Dumbbell / Haltera"],
+      "M27": [19.993, 22.72, "Nebulosa Dumbbell"],
       "M28": [18.408, -24.87, "Cúmulo globular en Sagitario"],
       "M29": [20.398, 38.53, "Torre de Enfriamiento (Cygnus)"],
-      "M30": [21.678, -23.18, "Cúmulo globular con colapso de núcleo"],
+      "M30": [21.678, -23.18, "Cúmulo globular en Capricornio"],
       "M31": [0.712, 41.27, "Galaxia de Andrómeda"],
       "M32": [0.712, 40.87, "Galaxia satélite enana de Andrómeda"],
       "M33": [1.564, 30.65, "Galaxia del Triángulo"],
-      "M34": [2.702, 42.78, "Cúmulo espiral en Perseo"],
+      "M34": [2.702, 42.78, "Cúmulo abierto en Perseo"],
       "M35": [6.148, 24.33, "Cúmulo abierto en Géminis"],
       "M36": [5.602, 34.13, "Cúmulo del Molinillo (Auriga)"],
-      "M37": [5.873, 32.55, "Cúmulo más rico en Auriga"],
+      "M37": [5.873, 32.55, "Cúmulo rico en Auriga"],
       "M38": [5.478, 35.85, "Cúmulo de la Estrella de Mar"],
-      "M39": [21.537, 48.43, "Cúmulo abierto grande en Cygnus"],
+      "M39": [21.537, 48.43, "Cúmulo abierto en Cygnus"],
       "M40": [12.373, 58.08, "Estrella doble Winnecke 4"],
       "M41": [6.783, -20.73, "Cúmulo del Pequeño Canis"],
       "M42": [5.588, -5.39, "Gran Nebulosa de Orión"],
       "M43": [5.592, -5.27, "Nebulosa de De Mairan"],
       "M44": [8.672, 19.68, "El Pesebre / Cúmulo de la Colmena"],
-      "M45": [3.79, 24.11, "Las Pléyades / Las Siete Hermanas"],
+      "M45": [3.79, 24.11, "Las Pléyades"],
       "M46": [7.697, -14.82, "Cúmulo con nebulosa planetaria"],
       "M47": [7.61, -14.48, "Cúmulo abierto brillante en Puppis"],
       "M48": [8.23, -5.8, "Cúmulo abierto en Hydra"],
       "M49": [12.497, 8.0, "Galaxia elíptica en Virgo"],
-      "M50": [7.053, -8.37, "Cúmulo del Corazón Acorazonado"],
+      "M50": [7.053, -8.37, "Cúmulo en Monoceros"],
       "M51": [13.498, 47.2, "Galaxia del Remolino"],
-      "M52": [23.403, 61.58, "Cúmulo de la Sal y Pimienta"],
+      "M52": [23.403, 61.58, "Cúmulo en Casiopea"],
       "M53": [13.215, 18.17, "Cúmulo globular en Coma Berenices"],
-      "M54": [18.918, -30.48, "Cúmulo de la Galaxia Enana Sgr"],
-      "M55": [19.667, -30.96, "Cúmulo globular del Espectro"],
+      "M54": [18.918, -30.48, "Cúmulo en la Galaxia Enana Sgr"],
+      "M55": [19.667, -30.96, "Cúmulo globular en Sagitario"],
       "M56": [19.277, 30.18, "Cúmulo globular en Lyra"],
       "M57": [18.893, 33.03, "Nebulosa del Anillo"],
-      "M58": [12.628, 11.82, "Galaxia espiral barrada en Virgo"],
+      "M58": [12.628, 11.82, "Galaxia espiral en Virgo"],
       "M59": [12.7, 11.65, "Galaxia elíptica en Virgo"],
-      "M60": [12.728, 11.55, "Galaxia elíptica gigante en Virgo"],
-      "M61": [12.365, 4.47, "Galaxia espiral activa en Virgo"],
-      "M62": [17.02, -30.11, "Cúmulo globular irregular en Ofiuco"],
+      "M60": [12.728, 11.55, "Galaxia elíptica en Virgo"],
+      "M61": [12.365, 4.47, "Galaxia espiral en Virgo"],
+      "M62": [17.02, -30.11, "Cúmulo globular en Ofiuco"],
       "M63": [13.263, 42.03, "Galaxia del Girasol"],
       "M64": [12.945, 21.68, "Galaxia del Ojo Negro"],
       "M65": [11.315, 13.09, "Galaxia del Triplete de Leo"],
-      "M66": [11.337, 12.99, "Galaxia principal del Triplete de Leo"],
+      "M66": [11.337, 12.99, "Galaxia del Triplete de Leo"],
       "M67": [8.847, 11.82, "Cúmulo del Rey Cobra en Cáncer"],
       "M68": [12.657, -26.75, "Cúmulo globular en Hydra"],
-      "M69": [18.523, -32.35, "Cúmulo globular rico en metales"],
+      "M69": [18.523, -32.35, "Cúmulo globular en Sagitario"],
       "M70": [18.722, -32.3, "Cúmulo globular en Sagitario"],
       "M71": [19.897, 18.78, "Cúmulo globular en Sagitta"],
-      "M72": [20.892, -12.54, "Cúmulo globular tenue en Acuario"],
-      "M73": [20.983, -12.63, "Asterismo de cuatro estrellas"],
+      "M72": [20.892, -12.54, "Cúmulo globular en Acuario"],
+      "M73": [20.983, -12.63, "Asterismo en Acuario"],
       "M74": [1.612, 15.78, "Galaxia Espiral Fantasma en Piscis"],
-      "M75": [20.102, -21.92, "Cúmulo globular compacto en Sagitario"],
-      "M76": [1.705, 51.57, "Pequeña Dumbbell / Nebulosa Corcho"],
+      "M75": [20.102, -21.92, "Cúmulo globular en Sagitario"],
+      "M76": [1.705, 51.57, "Pequeña Dumbbell en Perseo"],
       "M77": [2.712, -0.01, "Galaxia activa Cetus A"],
       "M78": [5.778, 0.05, "Nebulosa de reflexión en Orión"],
       "M79": [5.402, -24.52, "Cúmulo globular en Lepus"],
-      "M80": [16.283, -22.97, "Cúmulo globular muy denso en Escorpio"],
+      "M80": [16.283, -22.97, "Cúmulo globular en Escorpio"],
       "M81": [9.927, 69.07, "Galaxia de Bode"],
       "M82": [9.93, 69.68, "Galaxia del Cigarro"],
       "M83": [13.617, -29.61, "Molinillo Austral"],
-      "M84": [12.418, 12.9, "Galaxia lenticular en la Cadena Markarian"],
-      "M85": [12.423, 18.19, "Galaxia lenticular en Coma Berenices"],
-      "M86": [12.435, 12.95, "Galaxia lenticular gigante en Virgo"],
-      "M87": [12.513, 12.4, "Virgo A (Galaxia del agujero negro M87*)"],
-      "M88": [12.533, 14.42, "Galaxia espiral regular en Coma"],
-      "M89": [12.593, 12.56, "Galaxia elíptica esférica en Virgo"],
-      "M90": [12.613, 13.16, "Galaxia espiral con corrimiento al azul"],
+      "M84": [12.418, 12.9, "Galaxia lenticular en Virgo"],
+      "M85": [12.423, 18.19, "Galaxia lenticular en Coma"],
+      "M86": [12.435, 12.95, "Galaxia lenticular en Virgo"],
+      "M87": [12.513, 12.4, "Virgo A (Agujero negro M87*)"],
+      "M88": [12.533, 14.42, "Galaxia espiral en Coma"],
+      "M89": [12.593, 12.56, "Galaxia elíptica en Virgo"],
+      "M90": [12.613, 13.16, "Galaxia espiral en Virgo"],
       "M91": [12.59, 14.5, "Galaxia espiral barrada en Coma"],
-      "M92": [17.285, 43.14, "Segundo gran cúmulo en Hércules"],
+      "M92": [17.285, 43.14, "Cúmulo globular en Hércules"],
       "M93": [7.743, -23.85, "Cúmulo abierto en Puppis"],
       "M94": [12.848, 41.12, "Galaxia del Ojo de Cocodrilo"],
-      "M95": [10.733, 11.7, "Galaxia espiral anular en Leo"],
-      "M96": [10.778, 11.82, "Galaxia espiral doble en Leo"],
+      "M95": [10.733, 11.7, "Galaxia espiral en Leo"],
+      "M96": [10.778, 11.82, "Galaxia espiral en Leo"],
       "M97": [11.247, 55.02, "Nebulosa del Búho"],
-      "M98": [12.23, 14.9, "Galaxia espiral de canto en Coma"],
+      "M98": [12.23, 14.9, "Galaxia espiral en Coma"],
       "M99": [12.313, 14.42, "Galaxia del Molinillo de San José"],
       "M100": [12.382, 15.82, "Gran galaxia espiral en Coma"],
       "M101": [14.053, 54.35, "Galaxia del Molinillo"],
-      "M102": [15.11, 55.76, "Galaxia del Huso (NGC 5866)"],
+      "M102": [15.11, 55.76, "Galaxia del Huso"],
       "M103": [1.555, 60.7, "Cúmulo abierto en Casiopea"],
       "M104": [12.667, -11.62, "Galaxia del Sombrero"],
       "M105": [10.797, 12.58, "Galaxia elíptica en Leo"],
-      "M106": [12.317, 47.3, "Galaxia espiral con brazos de emisión"],
+      "M106": [12.317, 47.3, "Galaxia espiral en Canes Venatici"],
       "M107": [16.542, -13.05, "Cúmulo globular en Ofiuco"],
       "M108": [11.192, 55.67, "Galaxia de la Tabla de Surf"],
-      "M109": [11.96, 53.37, "Galaxia espiral aspiradora en Osa Mayor"],
+      "M109": [11.96, 53.37, "Galaxia espiral en Osa Mayor"],
       "M110": [0.673, 41.69, "Segunda galaxia satélite de Andrómeda"]
     };
 
-    // Población del desplegable con M# y Nombre
     const selectEl = document.getElementById('messierSelect');
     Object.keys(MESSIER).forEach(id => {
       const [ra, dec, name] = MESSIER[id];
@@ -279,10 +269,9 @@
       selectEl.appendChild(opt);
     });
 
-    let userLat = 37.18; // Utrera
+    let userLat = 37.18;
     let userLon = -5.78;
     let rawPhoneBeta = 0;
-    let userOffset = 0;
     let audioCtx = null;
     let lastBeepTime = 0;
 
@@ -315,14 +304,6 @@
       } catch (e) {}
     }
 
-    // Botón de calibración manual a 0° (apuntar al horizonte y pulsar)
-    document.getElementById('btnZero').addEventListener('click', () => {
-      const mode = document.getElementById('mountMode').value;
-      const baseAlt = (mode === 'perpendicular') ? (90 - rawPhoneBeta) : rawPhoneBeta;
-      userOffset = baseAlt;
-      alert(`Calibrado: Se toma la posición actual como horizonte 0° (Offset: ${userOffset.toFixed(1)}°)`);
-    });
-
     document.getElementById('btnInit').addEventListener('click', async () => {
       initAudio();
 
@@ -334,14 +315,14 @@
             document.getElementById('gpsStatus').innerText = 
               `GPS OK: Lat ${userLat.toFixed(2)}°, Lon ${userLon.toFixed(2)}°`;
           },
-          () => { document.getElementById('gpsStatus').innerText = 'GPS manual (37.18°, -5.78°)'; },
+          () => { document.getElementById('gpsStatus').innerText = 'GPS por defecto activo'; },
           { enableHighAccuracy: true }
         );
       }
 
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         const perm = await DeviceOrientationEvent.requestPermission();
-        if (perm !== 'granted') return alert('Permiso denegado');
+        if (perm !== 'granted') return alert('Permiso denegado para sensores');
       }
 
       window.addEventListener('deviceorientation', e => {
@@ -363,10 +344,9 @@
       const targetAlt = hor.altitude;
       const targetAz = hor.azimuth;
 
-      // Cálculo de altitud del móvil aplicando corrección según soporte
+      // Conversión de elevación según el montaje seleccionado
       const mode = document.getElementById('mountMode').value;
-      let calculatedPhoneAlt = (mode === 'perpendicular') ? (90 - rawPhoneBeta) : rawPhoneBeta;
-      calculatedPhoneAlt -= userOffset;
+      const calculatedPhoneAlt = (mode === 'perpendicular') ? (90 - rawPhoneBeta) : rawPhoneBeta;
 
       document.getElementById('targetAz').innerText = `${targetAz.toFixed(1)}°`;
       document.getElementById('targetAlt').innerText = `${targetAlt.toFixed(1)}°`;
@@ -394,7 +374,7 @@
         altEl.className = "indicator";
       }
 
-      // Audio continuo al centrar o pulsante al aproximarse
+      // Audio continuo (< 1°) o pulsos progresivos (< 8°)
       const t = performance.now();
       if (absDAlt < 1.0) {
         if (t - lastBeepTime > 140) {
