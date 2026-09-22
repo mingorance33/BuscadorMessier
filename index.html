@@ -30,31 +30,30 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 14px;
+      padding: 16px 14px;
       min-height: 100vh;
     }
 
     .container {
       width: 100%;
-      max-width: 460px;
+      max-width: 440px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     h1 {
       color: var(--accent);
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       text-align: center;
       margin-bottom: 2px;
-      letter-spacing: -0.5px;
     }
 
     .subtitle {
       text-align: center;
       font-size: 0.78rem;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .panel {
@@ -69,15 +68,11 @@
       background: var(--accent);
       color: #031326;
       border: none;
-      padding: 12px 16px;
-      font-size: 1rem;
+      padding: 12px;
+      font-size: 0.95rem;
       font-weight: 700;
       border-radius: 8px;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
     }
 
     .btn-action:active {
@@ -86,7 +81,7 @@
 
     .status-gps {
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       margin-top: 8px;
     }
@@ -99,11 +94,10 @@
     }
 
     .label-title {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .btn-chip {
@@ -128,18 +122,18 @@
       background: #090d16;
       color: #fff;
       border: 1px solid #334155;
-      padding: 10px 12px;
-      font-size: 0.95rem;
+      padding: 10px;
+      font-size: 0.92rem;
       border-radius: 8px;
       outline: none;
     }
 
     .section-title {
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       margin-bottom: 10px;
     }
 
@@ -154,7 +148,7 @@
       background: #070b12;
       border: 1px solid #1e293b;
       border-radius: 8px;
-      padding: 10px 8px;
+      padding: 10px;
       text-align: center;
     }
 
@@ -163,14 +157,10 @@
       color: var(--text-muted);
       text-transform: uppercase;
       margin-bottom: 4px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .coord-val {
-      font-size: 1.55rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--accent);
     }
@@ -192,7 +182,7 @@
     }
 
     .tripod-sector {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--green);
       font-weight: 600;
       margin-top: 4px;
@@ -200,7 +190,7 @@
 
     .sensor-reading {
       text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
       margin-bottom: 8px;
     }
@@ -210,11 +200,10 @@
       border: 1px solid #1f2937;
       color: var(--yellow);
       text-align: center;
-      padding: 14px;
+      padding: 12px;
       border-radius: 8px;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 900;
-      letter-spacing: 0.5px;
       text-transform: uppercase;
       transition: background 0.2s, color 0.2s;
     }
@@ -232,13 +221,11 @@
     <h1>Localizador Messier (M1 - M110)</h1>
     <div class="subtitle">Alineación: Marca 0° del trípode al Norte exacto</div>
 
-    <!-- Panel de Sensores y GPS -->
     <div class="panel">
       <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Sensor y Audio</button>
-      <div class="status-gps" id="gps-status">Lat: 37.18° N, Lon: -5.78° O (Esperando GPS)</div>
+      <div class="status-gps" id="gps-status">Lat: 37.18° N, Lon: -5.78° O (Esperando activación...)</div>
     </div>
 
-    <!-- Panel Selector -->
     <div class="panel">
       <div class="filter-row">
         <span class="label-title">Selecciona Objeto:</span>
@@ -247,11 +234,9 @@
       <select id="object-select" onchange="updateCalculations()"></select>
     </div>
 
-    <!-- Panel de Coordenadas y Trípode -->
     <div class="panel">
       <div class="section-title">Coordenadas en Vivo del Objeto</div>
 
-      <!-- Marca para Trípode de 90 en 90 -->
       <div class="tripod-box">
         <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
         <div class="tripod-val" id="disp-tripod">--°</div>
@@ -536,7 +521,7 @@
         banner.textContent = "¡EN EL BLANCO! (ALINEADO)";
         banner.classList.add('aligned');
         if (now - lastBeep > 250) {
-          playBeep(880, 0.15); // Tono agudo continuo intermitente
+          playBeep(880, 0.15);
           lastBeep = now;
         }
       } else {
@@ -547,7 +532,6 @@
           banner.textContent = `BAJA EL TUBO (-${(currentSensorPitch - currentAltTarget).toFixed(1)}°)`;
         }
 
-        // Pitido tipo geiger según cercanía (hasta 8 grados)
         if (diff < 8.0 && now - lastBeep > (diff * 90 + 80)) {
           playBeep(440, 0.05);
           lastBeep = now;
@@ -556,40 +540,53 @@
     }
 
     function handleOrientation(event) {
-      let pitch = event.beta; // Inclinación eje horizontal
-      if (pitch !== null) {
+      let pitch = event.beta;
+      if (pitch !== null && pitch !== undefined) {
         currentSensorPitch = pitch;
         document.getElementById('disp-sensor').textContent = `${pitch.toFixed(1)}°`;
         checkAlignment();
       }
     }
 
-    async function startApp() {
-      // Activar AudioContext por interacción de usuario
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-      }
+    function startApp() {
+      const btn = document.getElementById('btn-activate');
 
-      // Permisos de Orientación (iOS 13+)
+      // 1. SOLICITUD SÍNCRONA DIRECTA PARA SAFARI / IOS
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const perm = await DeviceOrientationEvent.requestPermission();
-          if (perm === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        } catch (e) {
-          alert("Error activando sensor de orientación: " + e);
-        }
+        DeviceOrientationEvent.requestPermission()
+          .then(permissionState => {
+            if (permissionState === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation, true);
+              btn.textContent = "Sensores y Audio Activos ✓";
+              btn.style.background = "#22c55e";
+            } else {
+              alert("Permiso de orientación denegado.");
+            }
+          })
+          .catch(err => {
+            alert("Error al solicitar sensor: " + err);
+          });
       } else {
-        window.addEventListener('deviceorientation', handleOrientation);
+        window.addEventListener('deviceorientation', handleOrientation, true);
+        btn.textContent = "Sensores y Audio Activos ✓";
+        btn.style.background = "#22c55e";
       }
 
-      // GPS
+      // 2. AUDIO CONTEXT
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      } catch (e) {
+        console.warn("Audio no iniciado", e);
+      }
+
+      // 3. GPS
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
+        navigator.geolocation.getCurrentPosition(pos => {
           userLat = pos.coords.latitude;
           userLon = pos.coords.longitude;
           document.getElementById('gps-status').textContent = 
@@ -600,12 +597,8 @@
             `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (Ubicación fija)`;
         });
       }
-
-      document.getElementById('btn-activate').textContent = "Sensores y Audio Activos ✓";
-      document.getElementById('btn-activate').style.background = "#22c55e";
     }
 
-    // Inicializar lista y refresco de posiciones celestes cada 4 segundos
     populateSelect();
     setInterval(updateCalculations, 4000);
   </script>
