@@ -137,6 +137,65 @@
       margin-bottom: 10px;
     }
 
+    /* Caja del Trípode con el Gráfico a la Derecha */
+    .tripod-box {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tripod-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .tripod-val {
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: var(--orange);
+      line-height: 1.05;
+      margin: 2px 0;
+    }
+
+    .tripod-sector {
+      font-size: 0.88rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Gráfico circular de sectores */
+    .quadrant-widget {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    .q-sector {
+      fill: #1e293b;
+      stroke: #090d16;
+      stroke-width: 2;
+      transition: fill 0.25s, filter 0.25s;
+    }
+
+    .q-sector.active {
+      fill: var(--orange);
+      filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7));
+    }
+
+    .q-cardinal {
+      font-size: 8px;
+      fill: #94a3b8;
+      font-weight: 800;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
     .coords-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -163,29 +222,6 @@
       font-size: 1.45rem;
       font-weight: 800;
       color: var(--accent);
-    }
-
-    .tripod-box {
-      background: #090d16;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .tripod-val {
-      font-size: 2.1rem;
-      font-weight: 900;
-      color: var(--orange);
-      line-height: 1.1;
-    }
-
-    .tripod-sector {
-      font-size: 0.88rem;
-      color: var(--green);
-      font-weight: 600;
-      margin-top: 4px;
     }
 
     .sensor-reading {
@@ -237,10 +273,37 @@
     <div class="panel">
       <div class="section-title">Coordenadas en Vivo del Objeto</div>
 
+      <!-- Marca para Trípode + Gráfico Circular de 4 Cuadrantes -->
       <div class="tripod-box">
-        <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
-        <div class="tripod-val" id="disp-tripod">--°</div>
-        <div class="tripod-sector" id="disp-sector">Esperando selección</div>
+        <div class="tripod-info">
+          <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
+          <div class="tripod-val" id="disp-tripod">--°</div>
+          <div class="tripod-sector" id="disp-sector">Esperando selección</div>
+        </div>
+        
+        <!-- Esfera con 4 sectores -->
+        <svg class="quadrant-widget" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="#0b0f17" stroke="#334155" stroke-width="1.5" />
+          
+          <!-- Cuadrante 4: Arriba-Izquierda (Oeste -> Norte) -->
+          <path id="sec-4" class="q-sector" d="M 50 50 L 50 8 A 42 42 0 0 0 8 50 Z" />
+          
+          <!-- Cuadrante 1: Arriba-Derecha (Norte -> Este) -->
+          <path id="sec-1" class="q-sector" d="M 50 50 L 92 50 A 42 42 0 0 0 50 8 Z" />
+          
+          <!-- Cuadrante 2: Abajo-Derecha (Este -> Sur) -->
+          <path id="sec-2" class="q-sector" d="M 50 50 L 50 92 A 42 42 0 0 0 92 50 Z" />
+          
+          <!-- Cuadrante 3: Abajo-Izquierda (Sur -> Oeste) -->
+          <path id="sec-3" class="q-sector" d="M 50 50 L 8 50 A 42 42 0 0 0 50 92 Z" />
+          
+          <!-- Centro y letras cardinales -->
+          <circle cx="50" cy="50" r="7" fill="#090d16" stroke="#475569" stroke-width="1" />
+          <text x="50" y="16" class="q-cardinal">N</text>
+          <text x="84" y="50" class="q-cardinal">E</text>
+          <text x="50" y="84" class="q-cardinal">S</text>
+          <text x="16" y="50" class="q-cardinal">O</text>
+        </svg>
       </div>
 
       <div class="coords-grid">
@@ -417,25 +480,44 @@
     function formatTripodQuadrant(az) {
       let sector = "";
       let dial = 0;
+      let sectorNum = 1;
 
       if (az >= 0 && az < 90) {
         dial = az;
         sector = "Norte ➔ Este (1er sector)";
+        sectorNum = 1;
       } else if (az >= 90 && az < 180) {
         dial = az - 90;
         sector = "Este ➔ Sur (2º sector)";
+        sectorNum = 2;
       } else if (az >= 180 && az < 270) {
         dial = az - 180;
         sector = "Sur ➔ Oeste (3er sector)";
+        sectorNum = 3;
       } else {
         dial = az - 270;
         sector = "Oeste ➔ Norte (4º sector)";
+        sectorNum = 4;
       }
 
       return {
         dial: `${dial.toFixed(1)}°`,
-        sector: sector
+        sector: sector,
+        sectorNum: sectorNum
       };
+    }
+
+    function updateQuadrantGraphic(sectorNum) {
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`sec-${i}`);
+        if (el) {
+          if (i === sectorNum) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
     }
 
     function populateSelect() {
@@ -489,6 +571,7 @@
       document.getElementById('disp-az').textContent = `${az.toFixed(1)}°`;
       document.getElementById('disp-alt').textContent = `${alt.toFixed(1)}°`;
 
+      updateQuadrantGraphic(tripod.sectorNum);
       checkAlignment();
     }
 
@@ -551,7 +634,6 @@
     function startApp() {
       const btn = document.getElementById('btn-activate');
 
-      // 1. SOLICITUD SÍNCRONA DIRECTA PARA SAFARI / IOS
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission()
           .then(permissionState => {
@@ -572,7 +654,6 @@
         btn.style.background = "#22c55e";
       }
 
-      // 2. AUDIO CONTEXT
       try {
         if (!audioCtx) {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -584,7 +665,6 @@
         console.warn("Audio no iniciado", e);
       }
 
-      // 3. GPS
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           userLat = pos.coords.latitude;
