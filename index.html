@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Localizador Messier (M1 - M110) - Trípode 90°</title>
+  <title>Localizador Messier con Brújula iPhone</title>
   <style>
     :root {
       --bg: #070b12;
@@ -15,6 +15,7 @@
       --green: #22c55e;
       --orange: #f97316;
       --yellow: #facc15;
+      --red: #ef4444;
     }
 
     * {
@@ -130,105 +131,151 @@
 
     .section-title {
       text-align: center;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      margin-bottom: 10px;
-    }
-
-    /* Caja del Trípode con el Gráfico a la Derecha */
-    .tripod-box {
-      background: #090d16;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px 14px;
       margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
     }
 
-    .tripod-info {
-      flex: 1;
-      text-align: left;
+    /* Brújula interactiva */
+    .compass-wrapper {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 14px auto;
     }
 
-    .tripod-val {
-      font-size: 2.3rem;
-      font-weight: 900;
-      color: var(--orange);
-      line-height: 1.05;
-      margin: 2px 0;
+    .compass-dial {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, #0b111e 60%, #070b12 100%);
+      border: 2px solid #334155;
+      box-shadow: 0 0 16px rgba(0,0,0,0.6);
+      position: relative;
+      transition: transform 0.1s linear;
     }
 
-    .tripod-sector {
-      font-size: 0.88rem;
-      color: var(--green);
-      font-weight: 600;
+    .compass-tick {
+      position: absolute;
+      width: 2px;
+      height: 10px;
+      background: #475569;
+      left: calc(50% - 1px);
+      top: 6px;
+      transform-origin: 50% 104px;
     }
 
-    /* Gráfico circular de sectores */
-    .quadrant-widget {
-      width: 80px;
-      height: 80px;
-      flex-shrink: 0;
+    .compass-tick.cardinal {
+      height: 14px;
+      width: 3px;
+      background: var(--text-muted);
     }
 
-    .q-sector {
-      fill: #1e293b;
-      stroke: #090d16;
-      stroke-width: 2;
-      transition: fill 0.25s, filter 0.25s;
-    }
-
-    .q-sector.active {
-      fill: var(--orange);
-      filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7));
-    }
-
-    .q-cardinal {
-      font-size: 8px;
-      fill: #94a3b8;
+    .compass-label {
+      position: absolute;
+      width: 20px;
+      font-size: 11px;
       font-weight: 800;
-      text-anchor: middle;
-      dominant-baseline: central;
+      color: var(--text-muted);
+      text-align: center;
+      left: calc(50% - 10px);
     }
 
-    .coords-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
+    .compass-label.north { top: 22px; color: var(--red); }
+    .compass-label.east { right: 22px; left: auto; top: calc(50% - 7px); }
+    .compass-label.south { bottom: 22px; left: calc(50% - 10px); }
+    .compass-label.west { left: 22px; top: calc(50% - 7px); }
+
+    /* Indicador fijo arriba (hacia dónde apunta el móvil) */
+    .compass-needle-fixed {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 14px solid var(--accent);
+      z-index: 10;
     }
 
-    .coord-box {
-      background: #070b12;
+    /* Aguja/Puntero hacia el objetivo */
+    .target-pointer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+
+    .target-dot {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      background: var(--orange);
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px var(--orange);
+    }
+
+    .compass-center-info {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .heading-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .heading-unit {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    .info-summary {
+      display: flex;
+      justify-content: space-around;
+      background: #090d16;
       border: 1px solid #1e293b;
       border-radius: 8px;
       padding: 10px;
+      margin-bottom: 12px;
       text-align: center;
     }
 
-    .coord-label {
+    .info-col-label {
       font-size: 0.68rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .coord-val {
-      font-size: 1.45rem;
+    .info-col-val {
+      font-size: 1.15rem;
       font-weight: 800;
       color: var(--accent);
     }
 
-    .sensor-reading {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+    .info-col-val.target-color {
+      color: var(--orange);
     }
 
     .target-banner {
@@ -238,8 +285,8 @@
       text-align: center;
       padding: 12px;
       border-radius: 8px;
-      font-size: 1.15rem;
-      font-weight: 900;
+      font-size: 1.05rem;
+      font-weight: 800;
       text-transform: uppercase;
       transition: background 0.2s, color 0.2s;
     }
@@ -255,11 +302,11 @@
 
   <div class="container">
     <h1>Localizador Messier (M1 - M110)</h1>
-    <div class="subtitle">Alineación: Marca 0° del trípode al Norte exacto</div>
+    <div class="subtitle">Guía por Brújula y Giroscopio iPhone</div>
 
     <div class="panel">
-      <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Sensor y Audio</button>
-      <div class="status-gps" id="gps-status">Lat: 37.18° N, Lon: -5.78° O (Esperando activación...)</div>
+      <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Brújula, Sensor y Audio</button>
+      <div class="status-gps" id="gps-status">Esperando activación de sensores...</div>
     </div>
 
     <div class="panel">
@@ -271,57 +318,47 @@
     </div>
 
     <div class="panel">
-      <div class="section-title">Coordenadas en Vivo del Objeto</div>
+      <div class="section-title">Brújula en Vivo vs Objetivo</div>
 
-      <!-- Marca para Trípode + Gráfico Circular de 4 Cuadrantes -->
-      <div class="tripod-box">
-        <div class="tripod-info">
-          <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
-          <div class="tripod-val" id="disp-tripod">--°</div>
-          <div class="tripod-sector" id="disp-sector">Esperando selección</div>
-        </div>
-        
-        <!-- Esfera con 4 sectores -->
-        <svg class="quadrant-widget" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="46" fill="#0b0f17" stroke="#334155" stroke-width="1.5" />
-          
-          <!-- Cuadrante 4: Arriba-Izquierda (Oeste -> Norte) -->
-          <path id="sec-4" class="q-sector" d="M 50 50 L 50 8 A 42 42 0 0 0 8 50 Z" />
-          
-          <!-- Cuadrante 1: Arriba-Derecha (Norte -> Este) -->
-          <path id="sec-1" class="q-sector" d="M 50 50 L 92 50 A 42 42 0 0 0 50 8 Z" />
-          
-          <!-- Cuadrante 2: Abajo-Derecha (Este -> Sur) -->
-          <path id="sec-2" class="q-sector" d="M 50 50 L 50 92 A 42 42 0 0 0 92 50 Z" />
-          
-          <!-- Cuadrante 3: Abajo-Izquierda (Sur -> Oeste) -->
-          <path id="sec-3" class="q-sector" d="M 50 50 L 8 50 A 42 42 0 0 0 50 92 Z" />
-          
-          <!-- Centro y letras cardinales -->
-          <circle cx="50" cy="50" r="7" fill="#090d16" stroke="#475569" stroke-width="1" />
-          <text x="50" y="16" class="q-cardinal">N</text>
-          <text x="84" y="50" class="q-cardinal">E</text>
-          <text x="50" y="84" class="q-cardinal">S</text>
-          <text x="16" y="50" class="q-cardinal">O</text>
-        </svg>
-      </div>
+      <!-- Widget de Brújula estilo iPhone -->
+      <div class="compass-wrapper">
+        <div class="compass-needle-fixed"></div>
 
-      <div class="coords-grid">
-        <div class="coord-box">
-          <div class="coord-label">Azimut 360°</div>
-          <div class="coord-val" id="disp-az">--°</div>
+        <div class="compass-dial" id="compass-dial">
+          <div class="compass-label north">N</div>
+          <div class="compass-label east">E</div>
+          <div class="compass-label south">S</div>
+          <div class="compass-label west">O</div>
+
+          <!-- Marcador que apunta al objeto -->
+          <div class="target-pointer" id="target-pointer">
+            <div class="target-dot" title="Posición del Objeto"></div>
+          </div>
         </div>
-        <div class="coord-box">
-          <div class="coord-label">Altitud Teórica</div>
-          <div class="coord-val" id="disp-alt">--°</div>
+
+        <div class="compass-center-info">
+          <div class="heading-val" id="disp-heading">--°</div>
+          <div class="heading-unit" id="disp-cardinal-dir">RUMBO</div>
         </div>
       </div>
 
-      <div class="sensor-reading">
-        Elevación actual del sensor: <strong id="disp-sensor">--°</strong>
+      <!-- Resumen de datos -->
+      <div class="info-summary">
+        <div>
+          <div class="info-col-label">Objeto (Az / Alt)</div>
+          <div class="info-col-val target-color" id="disp-target-coords">--° / --°</div>
+        </div>
+        <div>
+          <div class="info-col-label">Inclinación Tubo</div>
+          <div class="info-col-val" id="disp-sensor-pitch">--°</div>
+        </div>
+        <div>
+          <div class="info-col-label">Giro Requerido</div>
+          <div class="info-col-val" id="disp-turn">--°</div>
+        </div>
       </div>
 
-      <div class="target-banner" id="banner-status">INCLINA EL TUBO</div>
+      <div class="target-banner" id="banner-status">ACTIVA SENSORES</div>
     </div>
   </div>
 
@@ -442,10 +479,23 @@
     let userLat = 37.18;
     let userLon = -5.78;
     let onlyVisible = true;
+    let currentAzTarget = null;
     let currentAltTarget = null;
+    let currentCompassHeading = null;
     let currentSensorPitch = null;
     let audioCtx = null;
     let lastBeep = 0;
+
+    function buildCompassTicks() {
+      const dial = document.getElementById('compass-dial');
+      for (let i = 0; i < 360; i += 30) {
+        if (i % 90 === 0) continue;
+        const tick = document.createElement('div');
+        tick.className = 'compass-tick';
+        tick.style.transform = `rotate(${i}deg)`;
+        dial.appendChild(tick);
+      }
+    }
 
     function getLST(now, lon) {
       const jd = (now.getTime() / 86400000) + 2440587.5;
@@ -475,49 +525,6 @@
       if (Math.sin(H) > 0) az = 360 - az;
 
       return { az: az, alt: alt * r2d };
-    }
-
-    function formatTripodQuadrant(az) {
-      let sector = "";
-      let dial = 0;
-      let sectorNum = 1;
-
-      if (az >= 0 && az < 90) {
-        dial = az;
-        sector = "Norte ➔ Este (1er sector)";
-        sectorNum = 1;
-      } else if (az >= 90 && az < 180) {
-        dial = az - 90;
-        sector = "Este ➔ Sur (2º sector)";
-        sectorNum = 2;
-      } else if (az >= 180 && az < 270) {
-        dial = az - 180;
-        sector = "Sur ➔ Oeste (3er sector)";
-        sectorNum = 3;
-      } else {
-        dial = az - 270;
-        sector = "Oeste ➔ Norte (4º sector)";
-        sectorNum = 4;
-      }
-
-      return {
-        dial: `${dial.toFixed(1)}°`,
-        sector: sector,
-        sectorNum: sectorNum
-      };
-    }
-
-    function updateQuadrantGraphic(sectorNum) {
-      for (let i = 1; i <= 4; i++) {
-        const el = document.getElementById(`sec-${i}`);
-        if (el) {
-          if (i === sectorNum) {
-            el.classList.add('active');
-          } else {
-            el.classList.remove('active');
-          }
-        }
-      }
     }
 
     function populateSelect() {
@@ -563,16 +570,22 @@
       const lst = getLST(now, userLon);
       const { az, alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
 
+      currentAzTarget = az;
       currentAltTarget = alt;
 
-      const tripod = formatTripodQuadrant(az);
-      document.getElementById('disp-tripod').textContent = tripod.dial;
-      document.getElementById('disp-sector').textContent = tripod.sector;
-      document.getElementById('disp-az').textContent = `${az.toFixed(1)}°`;
-      document.getElementById('disp-alt').textContent = `${alt.toFixed(1)}°`;
+      document.getElementById('disp-target-coords').textContent = `${az.toFixed(1)}° / ${alt.toFixed(1)}°`;
 
-      updateQuadrantGraphic(tripod.sectorNum);
+      // Posicionar el punto objetivo en el dial de la brújula
+      const pointer = document.getElementById('target-pointer');
+      pointer.style.transform = `rotate(${az}deg)`;
+
       checkAlignment();
+    }
+
+    function getCardinalLabel(deg) {
+      const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+      const index = Math.round(deg / 45) % 8;
+      return dirs[index];
     }
 
     function playBeep(freq, duration) {
@@ -591,16 +604,27 @@
 
     function checkAlignment() {
       const banner = document.getElementById('banner-status');
-      if (currentAltTarget === null || currentSensorPitch === null) {
-        banner.textContent = "INCLINA EL TUBO";
+      if (currentAzTarget === null || currentAltTarget === null || currentCompassHeading === null || currentSensorPitch === null) {
+        banner.textContent = "APUNTA EL IPHONE";
         banner.classList.remove('aligned');
         return;
       }
 
-      const diff = Math.abs(currentSensorPitch - currentAltTarget);
+      // Diferencia azimutal (-180 a +180)
+      let diffAz = (currentAzTarget - currentCompassHeading + 540) % 360 - 180;
+      let diffAlt = currentAltTarget - currentSensorPitch;
+
+      const absDiffAz = Math.abs(diffAz);
+      const absDiffAlt = Math.abs(diffAlt);
+
+      // Mostrar giro requerido en texto
+      const turnLabel = diffAz > 0 ? `➔ Der ${absDiffAz.toFixed(1)}°` : `⬅ Izq ${absDiffAz.toFixed(1)}°`;
+      document.getElementById('disp-turn').textContent = turnLabel;
+
       const now = Date.now();
 
-      if (diff <= 1.0) {
+      // Tolerancia: Azimut <= 2.5° y Altitud <= 1.5°
+      if (absDiffAz <= 2.5 && absDiffAlt <= 1.5) {
         banner.textContent = "¡EN EL BLANCO! (ALINEADO)";
         banner.classList.add('aligned');
         if (now - lastBeep > 250) {
@@ -609,13 +633,19 @@
         }
       } else {
         banner.classList.remove('aligned');
-        if (currentSensorPitch < currentAltTarget) {
-          banner.textContent = `SUBE EL TUBO (+${(currentAltTarget - currentSensorPitch).toFixed(1)}°)`;
-        } else {
-          banner.textContent = `BAJA EL TUBO (-${(currentSensorPitch - currentAltTarget).toFixed(1)}°)`;
+        
+        let instructions = [];
+        if (absDiffAz > 2.5) {
+          instructions.push(diffAz > 0 ? `GIRA DERECHA (${absDiffAz.toFixed(1)}°)` : `GIRA IZQUIERDA (${absDiffAz.toFixed(1)}°)`);
+        }
+        if (absDiffAlt > 1.5) {
+          instructions.push(diffAlt > 0 ? `SUBE (+${diffAlt.toFixed(1)}°)` : `BAJA (${diffAlt.toFixed(1)}°)`);
         }
 
-        if (diff < 8.0 && now - lastBeep > (diff * 90 + 80)) {
+        banner.textContent = instructions.join(" | ");
+
+        const combinedDiff = Math.sqrt(absDiffAz * absDiffAz + absDiffAlt * absDiffAlt);
+        if (combinedDiff < 10.0 && now - lastBeep > (combinedDiff * 70 + 80)) {
           playBeep(440, 0.05);
           lastBeep = now;
         }
@@ -623,12 +653,32 @@
     }
 
     function handleOrientation(event) {
-      let pitch = event.beta;
-      if (pitch !== null && pitch !== undefined) {
-        currentSensorPitch = pitch;
-        document.getElementById('disp-sensor').textContent = `${pitch.toFixed(1)}°`;
-        checkAlignment();
+      // 1. Rumbo de la brújula iPhone (webkitCompassHeading)
+      let heading = null;
+      if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+        heading = event.webkitCompassHeading;
+      } else if (event.alpha !== null) {
+        // Fallback genérico si no es Safari iOS
+        heading = (360 - event.alpha) % 360;
       }
+
+      if (heading !== null) {
+        currentCompassHeading = heading;
+        document.getElementById('disp-heading').textContent = `${Math.round(heading)}°`;
+        document.getElementById('disp-cardinal-dir').textContent = getCardinalLabel(heading);
+
+        // La rosa de los vientos rota en dirección opuesta al rumbo
+        const dial = document.getElementById('compass-dial');
+        dial.style.transform = `rotate(${-heading}deg)`;
+      }
+
+      // 2. Inclinación del tubo (Pitch / Beta)
+      if (event.beta !== null && event.beta !== undefined) {
+        currentSensorPitch = event.beta;
+        document.getElementById('disp-sensor-pitch').textContent = `${event.beta.toFixed(1)}°`;
+      }
+
+      checkAlignment();
     }
 
     function startApp() {
@@ -639,7 +689,7 @@
           .then(permissionState => {
             if (permissionState === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation, true);
-              btn.textContent = "Sensores y Audio Activos ✓";
+              btn.textContent = "Brújula y Sensores Activos ✓";
               btn.style.background = "#22c55e";
             } else {
               alert("Permiso de orientación denegado.");
@@ -650,7 +700,7 @@
           });
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
-        btn.textContent = "Sensores y Audio Activos ✓";
+        btn.textContent = "Brújula y Sensores Activos ✓";
         btn.style.background = "#22c55e";
       }
 
@@ -679,6 +729,7 @@
       }
     }
 
+    buildCompassTicks();
     populateSelect();
     setInterval(updateCalculations, 4000);
   </script>
