@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Localizador Messier con Brújula iPhone</title>
+  <title>Localizador Celeste - Brújula iPhone</title>
+  
+  <!-- Motor de efemérides astronómicas de alta precisión -->
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+
   <style>
     :root {
       --bg: #070b12;
@@ -52,7 +56,7 @@
 
     .subtitle {
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
       margin-bottom: 4px;
     }
@@ -129,6 +133,17 @@
       outline: none;
     }
 
+    optgroup {
+      background: #0f1724;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    option {
+      background: #090d16;
+      color: #fff;
+    }
+
     .section-title {
       text-align: center;
       font-size: 0.75rem;
@@ -138,7 +153,6 @@
       margin-bottom: 12px;
     }
 
-    /* Brújula interactiva */
     .compass-wrapper {
       position: relative;
       width: 220px;
@@ -167,12 +181,6 @@
       transform-origin: 50% 104px;
     }
 
-    .compass-tick.cardinal {
-      height: 14px;
-      width: 3px;
-      background: var(--text-muted);
-    }
-
     .compass-label {
       position: absolute;
       width: 20px;
@@ -188,7 +196,6 @@
     .compass-label.south { bottom: 22px; left: calc(50% - 10px); }
     .compass-label.west { left: 22px; top: calc(50% - 7px); }
 
-    /* Indicador fijo arriba (hacia dónde apunta el móvil) */
     .compass-needle-fixed {
       position: absolute;
       top: -6px;
@@ -202,7 +209,6 @@
       z-index: 10;
     }
 
-    /* Aguja/Puntero hacia el objetivo */
     .target-pointer {
       position: absolute;
       width: 100%;
@@ -269,7 +275,7 @@
     }
 
     .info-col-val {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 800;
       color: var(--accent);
     }
@@ -301,8 +307,8 @@
 <body>
 
   <div class="container">
-    <h1>Localizador Messier (M1 - M110)</h1>
-    <div class="subtitle">Guía por Brújula y Giroscopio iPhone</div>
+    <h1>Localizador Celeste</h1>
+    <div class="subtitle">Estrellas Guía, Planetas y Catálogo Messier</div>
 
     <div class="panel">
       <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Brújula, Sensor y Audio</button>
@@ -320,7 +326,6 @@
     <div class="panel">
       <div class="section-title">Brújula en Vivo vs Objetivo</div>
 
-      <!-- Widget de Brújula estilo iPhone -->
       <div class="compass-wrapper">
         <div class="compass-needle-fixed"></div>
 
@@ -330,7 +335,6 @@
           <div class="compass-label south">S</div>
           <div class="compass-label west">O</div>
 
-          <!-- Marcador que apunta al objeto -->
           <div class="target-pointer" id="target-pointer">
             <div class="target-dot" title="Posición del Objeto"></div>
           </div>
@@ -342,7 +346,6 @@
         </div>
       </div>
 
-      <!-- Resumen de datos -->
       <div class="info-summary">
         <div>
           <div class="info-col-label">Objeto (Az / Alt)</div>
@@ -363,6 +366,35 @@
   </div>
 
   <script>
+    // 1. Estrellas principales de referencia y calibración
+    const BRIGHT_STARS_DATA = [
+      { id: "STAR_Polaris", name: "Polaris (Estrella Polar)", con: "UMi", ra: 2.530, dec: 89.26 },
+      { id: "STAR_Vega", name: "Vega", con: "Lyr", ra: 18.615, dec: 38.78 },
+      { id: "STAR_Altair", name: "Altair", con: "Aql", ra: 19.846, dec: 8.87 },
+      { id: "STAR_Deneb", name: "Deneb", con: "Cyg", ra: 20.690, dec: 45.28 },
+      { id: "STAR_Sirius", name: "Sirio", con: "CMa", ra: 6.752, dec: -16.72 },
+      { id: "STAR_Betelgeuse", name: "Betelgeuse", con: "Ori", ra: 5.919, dec: 7.41 },
+      { id: "STAR_Rigel", name: "Rigel", con: "Ori", ra: 5.242, dec: -8.20 },
+      { id: "STAR_Arcturus", name: "Arturo (Arcturus)", con: "Boo", ra: 14.261, dec: 19.18 },
+      { id: "STAR_Aldebaran", name: "Aldebarán", con: "Tau", ra: 4.598, dec: 16.51 },
+      { id: "STAR_Capella", name: "Capella", con: "Aur", ra: 5.278, dec: 45.99 },
+      { id: "STAR_Antares", name: "Antares", con: "Sco", ra: 16.490, dec: -26.43 },
+      { id: "STAR_Spica", name: "Espiga (Spica)", con: "Vir", ra: 13.420, dec: -11.16 }
+    ];
+
+    // 2. Sistema Solar
+    const SOLAR_SYSTEM_DATA = [
+      { id: "PLANET_Moon", name: "Luna", body: "Moon" },
+      { id: "PLANET_Mercury", name: "Mercurio", body: "Mercury" },
+      { id: "PLANET_Venus", name: "Venus", body: "Venus" },
+      { id: "PLANET_Mars", name: "Marte", body: "Mars" },
+      { id: "PLANET_Jupiter", name: "Júpiter", body: "Jupiter" },
+      { id: "PLANET_Saturn", name: "Saturno", body: "Saturn" },
+      { id: "PLANET_Uranus", name: "Urano", body: "Uranus" },
+      { id: "PLANET_Neptune", name: "Neptuno", body: "Neptune" }
+    ];
+
+    // 3. Catálogo Messier
     const MESSIER_DATA = [
       { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", ra: 5.575, dec: 22.01 },
       { id: "M2", name: "Cúmulo globular", con: "Aqr", ra: 21.558, dec: -0.82 },
@@ -478,6 +510,7 @@
 
     let userLat = 37.18;
     let userLon = -5.78;
+    let userElevation = 0;
     let onlyVisible = true;
     let currentAzTarget = null;
     let currentAltTarget = null;
@@ -485,6 +518,56 @@
     let currentSensorPitch = null;
     let audioCtx = null;
     let lastBeep = 0;
+
+    // Cálculo unificado de coordenadas horizontales
+    function getTargetAltAz(targetId, date, lat, lon, elev) {
+      if (typeof Astronomy !== 'undefined') {
+        const observer = new Astronomy.Observer(lat, lon, elev);
+
+        // 1. Si es planeta o la Luna
+        if (targetId.startsWith("PLANET_")) {
+          const bodyKey = targetId.replace("PLANET_", "");
+          const equ2000 = Astronomy.Equator(bodyKey, date, observer, true, true);
+          const hor = Astronomy.Horizon(date, observer, equ2000.ra, equ2000.dec, 'normal');
+          return { az: hor.azimuth, alt: hor.altitude };
+        }
+
+        // 2. Si es estrella brillante de calibración
+        if (targetId.startsWith("STAR_")) {
+          const star = BRIGHT_STARS_DATA.find(s => s.id === targetId);
+          if (star) {
+            const hor = Astronomy.Horizon(date, observer, star.ra, star.dec, 'normal');
+            return { az: hor.azimuth, alt: hor.altitude };
+          }
+        }
+
+        // 3. Si es objeto Messier
+        const obj = MESSIER_DATA.find(o => o.id === targetId);
+        if (obj) {
+          const hor = Astronomy.Horizon(date, observer, obj.ra, obj.dec, 'normal');
+          return { az: hor.azimuth, alt: hor.altitude };
+        }
+      } else {
+        // Fallback básico si la CDN no ha terminado de cargar
+        let item = BRIGHT_STARS_DATA.find(s => s.id === targetId) || MESSIER_DATA.find(o => o.id === targetId);
+        if (!item) return { az: 0, alt: -90 };
+
+        const d2r = Math.PI / 180, r2d = 180 / Math.PI;
+        const jd = (date.getTime() / 86400000) + 2440587.5;
+        const d = jd - 2451545.0;
+        let gmst = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24;
+        let lst = ((gmst + (lon / 15.0)) % 24 + 24) % 24;
+        let ha = (((lst - item.ra) * 15.0) % 360 + 360) % 360;
+        let phi = lat * d2r, delta = item.dec * d2r, H = ha * d2r;
+        let sinAlt = Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H);
+        let alt = Math.asin(sinAlt);
+        let cosAz = (Math.sin(delta) - Math.sin(phi) * Math.sin(alt)) / (Math.cos(phi) * Math.cos(alt));
+        let az = Math.acos(Math.max(-1, Math.min(1, cosAz))) * r2d;
+        if (Math.sin(H) > 0) az = 360 - az;
+        return { az, alt: alt * r2d };
+      }
+      return { az: 0, alt: -90 };
+    }
 
     function buildCompassTicks() {
       const dial = document.getElementById('compass-dial');
@@ -497,53 +580,63 @@
       }
     }
 
-    function getLST(now, lon) {
-      const jd = (now.getTime() / 86400000) + 2440587.5;
-      const d = jd - 2451545.0;
-      let gmst = 18.697374558 + 24.06570982441908 * d;
-      gmst = ((gmst % 24) + 24) % 24;
-      let lst = gmst + (lon / 15.0);
-      return ((lst % 24) + 24) % 24;
-    }
-
-    function raDecToAltAz(ra, dec, lat, lst) {
-      const d2r = Math.PI / 180;
-      const r2d = 180 / Math.PI;
-
-      let ha = (lst - ra) * 15.0;
-      ha = ((ha % 360) + 360) % 360;
-
-      const phi = lat * d2r;
-      const delta = dec * d2r;
-      const H = ha * d2r;
-
-      const sinAlt = Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H);
-      const alt = Math.asin(sinAlt);
-
-      const cosAz = (Math.sin(delta) - Math.sin(phi) * Math.sin(alt)) / (Math.cos(phi) * Math.cos(alt));
-      let az = Math.acos(Math.max(-1, Math.min(1, cosAz))) * r2d;
-      if (Math.sin(H) > 0) az = 360 - az;
-
-      return { az: az, alt: alt * r2d };
-    }
-
     function populateSelect() {
       const select = document.getElementById('object-select');
       const prevSelected = select.value;
       select.innerHTML = "";
 
       const now = new Date();
-      const lst = getLST(now, userLon);
+
+      // 1. Grupo Estrellas Principales (Guía / Calibración)
+      const optgroupStars = document.createElement('optgroup');
+      optgroupStars.label = "⭐ Estrellas Guía y Calibración";
+
+      BRIGHT_STARS_DATA.forEach(star => {
+        const { alt } = getTargetAltAz(star.id, now, userLat, userLon, userElevation);
+        if (onlyVisible && alt <= 0) return;
+        const opt = document.createElement('option');
+        opt.value = star.id;
+        opt.textContent = `${star.name} (${star.con}) (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
+        optgroupStars.appendChild(opt);
+      });
+
+      if (optgroupStars.children.length > 0) {
+        select.appendChild(optgroupStars);
+      }
+
+      // 2. Grupo Planetas y Luna
+      const optgroupPlanets = document.createElement('optgroup');
+      optgroupPlanets.label = "🪐 Planetas y Luna";
+
+      SOLAR_SYSTEM_DATA.forEach(p => {
+        const { alt } = getTargetAltAz(p.id, now, userLat, userLon, userElevation);
+        if (onlyVisible && alt <= 0) return;
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
+        optgroupPlanets.appendChild(opt);
+      });
+
+      if (optgroupPlanets.children.length > 0) {
+        select.appendChild(optgroupPlanets);
+      }
+
+      // 3. Grupo Catálogo Messier
+      const optgroupMessier = document.createElement('optgroup');
+      optgroupMessier.label = "🌌 Catálogo Messier";
 
       MESSIER_DATA.forEach(obj => {
-        const { alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
+        const { alt } = getTargetAltAz(obj.id, now, userLat, userLon, userElevation);
         if (onlyVisible && alt <= 0) return;
-
         const opt = document.createElement('option');
         opt.value = obj.id;
         opt.textContent = `${obj.id} — ${obj.name ? obj.name : obj.con} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
-        select.appendChild(opt);
+        optgroupMessier.appendChild(opt);
       });
+
+      if (optgroupMessier.children.length > 0) {
+        select.appendChild(optgroupMessier);
+      }
 
       if (prevSelected && Array.from(select.options).some(o => o.value === prevSelected)) {
         select.value = prevSelected;
@@ -563,19 +656,14 @@
       const select = document.getElementById('object-select');
       if (!select.value) return;
 
-      const obj = MESSIER_DATA.find(o => o.id === select.value);
-      if (!obj) return;
-
       const now = new Date();
-      const lst = getLST(now, userLon);
-      const { az, alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
+      const { az, alt } = getTargetAltAz(select.value, now, userLat, userLon, userElevation);
 
       currentAzTarget = az;
       currentAltTarget = alt;
 
       document.getElementById('disp-target-coords').textContent = `${az.toFixed(1)}° / ${alt.toFixed(1)}°`;
 
-      // Posicionar el punto objetivo en el dial de la brújula
       const pointer = document.getElementById('target-pointer');
       pointer.style.transform = `rotate(${az}deg)`;
 
@@ -584,8 +672,7 @@
 
     function getCardinalLabel(deg) {
       const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-      const index = Math.round(deg / 45) % 8;
-      return dirs[index];
+      return dirs[Math.round(deg / 45) % 8];
     }
 
     function playBeep(freq, duration) {
@@ -610,20 +697,17 @@
         return;
       }
 
-      // Diferencia azimutal (-180 a +180)
       let diffAz = (currentAzTarget - currentCompassHeading + 540) % 360 - 180;
       let diffAlt = currentAltTarget - currentSensorPitch;
 
       const absDiffAz = Math.abs(diffAz);
       const absDiffAlt = Math.abs(diffAlt);
 
-      // Mostrar giro requerido en texto
       const turnLabel = diffAz > 0 ? `➔ Der ${absDiffAz.toFixed(1)}°` : `⬅ Izq ${absDiffAz.toFixed(1)}°`;
       document.getElementById('disp-turn').textContent = turnLabel;
 
       const now = Date.now();
 
-      // Tolerancia: Azimut <= 2.5° y Altitud <= 1.5°
       if (absDiffAz <= 2.5 && absDiffAlt <= 1.5) {
         banner.textContent = "¡EN EL BLANCO! (ALINEADO)";
         banner.classList.add('aligned');
@@ -633,7 +717,6 @@
         }
       } else {
         banner.classList.remove('aligned');
-        
         let instructions = [];
         if (absDiffAz > 2.5) {
           instructions.push(diffAz > 0 ? `GIRA DERECHA (${absDiffAz.toFixed(1)}°)` : `GIRA IZQUIERDA (${absDiffAz.toFixed(1)}°)`);
@@ -641,7 +724,6 @@
         if (absDiffAlt > 1.5) {
           instructions.push(diffAlt > 0 ? `SUBE (+${diffAlt.toFixed(1)}°)` : `BAJA (${diffAlt.toFixed(1)}°)`);
         }
-
         banner.textContent = instructions.join(" | ");
 
         const combinedDiff = Math.sqrt(absDiffAz * absDiffAz + absDiffAlt * absDiffAlt);
@@ -653,12 +735,10 @@
     }
 
     function handleOrientation(event) {
-      // 1. Rumbo de la brújula iPhone (webkitCompassHeading)
       let heading = null;
       if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
         heading = event.webkitCompassHeading;
       } else if (event.alpha !== null) {
-        // Fallback genérico si no es Safari iOS
         heading = (360 - event.alpha) % 360;
       }
 
@@ -666,13 +746,9 @@
         currentCompassHeading = heading;
         document.getElementById('disp-heading').textContent = `${Math.round(heading)}°`;
         document.getElementById('disp-cardinal-dir').textContent = getCardinalLabel(heading);
-
-        // La rosa de los vientos rota en dirección opuesta al rumbo
-        const dial = document.getElementById('compass-dial');
-        dial.style.transform = `rotate(${-heading}deg)`;
+        document.getElementById('compass-dial').style.transform = `rotate(${-heading}deg)`;
       }
 
-      // 2. Inclinación del tubo (Pitch / Beta)
       if (event.beta !== null && event.beta !== undefined) {
         currentSensorPitch = event.beta;
         document.getElementById('disp-sensor-pitch').textContent = `${event.beta.toFixed(1)}°`;
@@ -705,20 +781,15 @@
       }
 
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-      } catch (e) {
-        console.warn("Audio no iniciado", e);
-      }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (e) {}
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           userLat = pos.coords.latitude;
           userLon = pos.coords.longitude;
+          userElevation = pos.coords.altitude || 0;
           document.getElementById('gps-status').textContent = 
             `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (GPS Activo)`;
           populateSelect();
@@ -731,7 +802,7 @@
 
     buildCompassTicks();
     populateSelect();
-    setInterval(updateCalculations, 4000);
+    setInterval(updateCalculations, 3000);
   </script>
 </body>
 </html>
