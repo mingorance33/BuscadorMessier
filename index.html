@@ -95,7 +95,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .label-title {
@@ -105,20 +105,29 @@
       text-transform: uppercase;
     }
 
-    .btn-chip {
-      background: #1e293b;
+    /* Selector de dos botones para evitar confusiones */
+    .segmented-control {
+      display: flex;
+      background: #090d16;
+      border-radius: 8px;
+      padding: 2px;
       border: 1px solid #334155;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
     }
 
-    .btn-chip.active {
+    .seg-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .seg-btn.active {
       background: #0284c7;
-      border-color: var(--accent);
       color: #fff;
     }
 
@@ -318,7 +327,10 @@
     <div class="panel">
       <div class="filter-row">
         <span class="label-title">Selecciona Objeto:</span>
-        <button class="btn-chip active" id="filter-btn" onclick="toggleOnlyVisible()">Solo Visibles</button>
+        <div class="segmented-control">
+          <button class="seg-btn active" id="btn-vis" onclick="setFilter(true)">Visibles</button>
+          <button class="seg-btn" id="btn-all" onclick="setFilter(false)">Todos</button>
+        </div>
       </div>
       <select id="object-select" onchange="updateCalculations()"></select>
     </div>
@@ -366,7 +378,7 @@
   </div>
 
   <script>
-    // 1. Estrellas principales de referencia y calibración
+    // 1. Estrellas de referencia y calibración
     const BRIGHT_STARS_DATA = [
       { id: "STAR_Polaris", name: "Polaris (Estrella Polar)", con: "UMi", ra: 2.530, dec: 89.26 },
       { id: "STAR_Vega", name: "Vega", con: "Lyr", ra: 18.615, dec: 38.78 },
@@ -524,7 +536,7 @@
       if (typeof Astronomy !== 'undefined') {
         const observer = new Astronomy.Observer(lat, lon, elev);
 
-        // 1. Si es planeta o la Luna
+        // 1. Planetas o la Luna
         if (targetId.startsWith("PLANET_")) {
           const bodyKey = targetId.replace("PLANET_", "");
           const equ2000 = Astronomy.Equator(bodyKey, date, observer, true, true);
@@ -532,7 +544,7 @@
           return { az: hor.azimuth, alt: hor.altitude };
         }
 
-        // 2. Si es estrella brillante de calibración
+        // 2. Estrellas de calibración
         if (targetId.startsWith("STAR_")) {
           const star = BRIGHT_STARS_DATA.find(s => s.id === targetId);
           if (star) {
@@ -541,14 +553,14 @@
           }
         }
 
-        // 3. Si es objeto Messier
+        // 3. Catálogo Messier
         const obj = MESSIER_DATA.find(o => o.id === targetId);
         if (obj) {
           const hor = Astronomy.Horizon(date, observer, obj.ra, obj.dec, 'normal');
           return { az: hor.azimuth, alt: hor.altitude };
         }
       } else {
-        // Fallback básico si la CDN no ha terminado de cargar
+        // Fallback matemático sin conexión (fórmulas trigonométricas)
         let item = BRIGHT_STARS_DATA.find(s => s.id === targetId) || MESSIER_DATA.find(o => o.id === targetId);
         if (!item) return { az: 0, alt: -90 };
 
@@ -587,7 +599,7 @@
 
       const now = new Date();
 
-      // 1. Grupo Estrellas Principales (Guía / Calibración)
+      // 1. Estrellas Guía
       const optgroupStars = document.createElement('optgroup');
       optgroupStars.label = "⭐ Estrellas Guía y Calibración";
 
@@ -599,12 +611,9 @@
         opt.textContent = `${star.name} (${star.con}) (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
         optgroupStars.appendChild(opt);
       });
+      if (optgroupStars.children.length > 0) select.appendChild(optgroupStars);
 
-      if (optgroupStars.children.length > 0) {
-        select.appendChild(optgroupStars);
-      }
-
-      // 2. Grupo Planetas y Luna
+      // 2. Planetas y Luna
       const optgroupPlanets = document.createElement('optgroup');
       optgroupPlanets.label = "🪐 Planetas y Luna";
 
@@ -616,12 +625,9 @@
         opt.textContent = `${p.name} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
         optgroupPlanets.appendChild(opt);
       });
+      if (optgroupPlanets.children.length > 0) select.appendChild(optgroupPlanets);
 
-      if (optgroupPlanets.children.length > 0) {
-        select.appendChild(optgroupPlanets);
-      }
-
-      // 3. Grupo Catálogo Messier
+      // 3. Catálogo Messier
       const optgroupMessier = document.createElement('optgroup');
       optgroupMessier.label = "🌌 Catálogo Messier";
 
@@ -633,10 +639,7 @@
         opt.textContent = `${obj.id} — ${obj.name ? obj.name : obj.con} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
         optgroupMessier.appendChild(opt);
       });
-
-      if (optgroupMessier.children.length > 0) {
-        select.appendChild(optgroupMessier);
-      }
+      if (optgroupMessier.children.length > 0) select.appendChild(optgroupMessier);
 
       if (prevSelected && Array.from(select.options).some(o => o.value === prevSelected)) {
         select.value = prevSelected;
@@ -644,11 +647,11 @@
       updateCalculations();
     }
 
-    function toggleOnlyVisible() {
-      onlyVisible = !onlyVisible;
-      const btn = document.getElementById('filter-btn');
-      btn.classList.toggle('active', onlyVisible);
-      btn.textContent = onlyVisible ? "Solo Visibles" : "Mostrar Todos";
+    // Manejador del interruptor segmentado
+    function setFilter(visibleOnly) {
+      onlyVisible = visibleOnly;
+      document.getElementById('btn-vis').classList.toggle('active', visibleOnly);
+      document.getElementById('btn-all').classList.toggle('active', !visibleOnly);
       populateSelect();
     }
 
