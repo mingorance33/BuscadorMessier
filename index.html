@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Localizador Celeste - Horizontal</title>
   
+  <!-- Soporte para Pantalla Completa en iOS (Añadir a Pantalla de Inicio) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Localizador">
+  
   <!-- Motor de efemérides astronómicas de alta precisión -->
   <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 
@@ -38,6 +43,7 @@
       align-items: center;
       padding: 8px 12px;
       overflow-x: hidden;
+      user-select: none;
     }
 
     .container {
@@ -45,7 +51,7 @@
       max-width: 900px;
       display: grid;
       grid-template-columns: 1fr 1.25fr;
-      gap: 12px;
+      gap: 10px;
       align-items: stretch;
     }
 
@@ -53,7 +59,7 @@
     .col-left {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       justify-content: space-between;
     }
 
@@ -61,7 +67,7 @@
     .col-right {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
     }
 
@@ -69,55 +75,73 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px;
+      padding: 8px 10px;
     }
 
     .header-box {
-      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     h1 {
       color: var(--accent);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       line-height: 1.2;
     }
 
     .subtitle {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
     }
 
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 6px;
+    }
+
     .btn-action {
-      width: 100%;
       background: var(--accent);
       color: #031326;
       border: none;
       padding: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
     }
 
-    .btn-action:active {
+    .btn-fullscreen {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid #334155;
+      padding: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-action:active, .btn-fullscreen:active {
       transform: scale(0.98);
     }
 
     .status-gps {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .filter-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .label-title {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
@@ -135,7 +159,7 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 4px;
@@ -172,8 +196,8 @@
     /* Brújula */
     .compass-wrapper {
       position: relative;
-      width: 160px;
-      height: 160px;
+      width: 155px;
+      height: 155px;
       margin: 0 auto;
     }
 
@@ -195,7 +219,7 @@
       background: #475569;
       left: calc(50% - 1px);
       top: 4px;
-      transform-origin: 50% 76px;
+      transform-origin: 50% 73.5px;
     }
 
     .compass-label {
@@ -283,7 +307,7 @@
     }
 
     .info-col-label {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       color: var(--text-muted);
       text-transform: uppercase;
     }
@@ -303,7 +327,7 @@
       border: 1px solid #1f2937;
       color: var(--yellow);
       text-align: center;
-      padding: 8px 6px;
+      padding: 7px 6px;
       border-radius: 6px;
       font-size: 0.85rem;
       font-weight: 800;
@@ -316,34 +340,25 @@
       border-color: #22c55e;
       color: #86efac;
     }
-
-    /* Fallback por si la pantalla se gira accidentalmente a vertical */
-    @media (orientation: portrait) {
-      .container {
-        grid-template-columns: 1fr;
-      }
-      .compass-wrapper {
-        width: 190px;
-        height: 190px;
-      }
-      .compass-tick {
-        transform-origin: 50% 91px;
-      }
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- COLUMNA IZQUIERDA: CONFIGURACIÓN -->
+    <!-- COLUMNA IZQUIERDA -->
     <div class="col-left">
       <div class="panel header-box">
-        <h1>Localizador Celeste</h1>
-        <div class="subtitle">Modo Horizontal (Telescopio / Buscador)</div>
+        <div>
+          <h1>Localizador Celeste</h1>
+          <div class="subtitle">Modo Horizontal (GoTo Asistido)</div>
+        </div>
       </div>
 
       <div class="panel">
-        <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Brújula y Sensores</button>
+        <div class="btn-row">
+          <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Sensores</button>
+          <button class="btn-fullscreen" id="btn-fs" onclick="toggleFullscreen()">⛶ Completa</button>
+        </div>
         <div class="status-gps" id="gps-status">Esperando activación...</div>
       </div>
 
@@ -374,9 +389,9 @@
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA: GUIADO Y BRÚJULA -->
+    <!-- COLUMNA DERECHA -->
     <div class="col-right">
-      <div class="panel" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <div class="panel" style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
         <div class="compass-wrapper">
           <div class="compass-needle-fixed"></div>
 
@@ -449,6 +464,31 @@
     let currentSensorPitch = null;
     let audioCtx = null;
     let lastBeep = 0;
+
+    // CONTROL DE PANTALLA COMPLETA Y BLOQUEO HORIZONTAL
+    function toggleFullscreen() {
+      const doc = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (doc.requestFullscreen) {
+          doc.requestFullscreen().catch(() => {});
+        } else if (doc.webkitRequestFullscreen) {
+          doc.webkitRequestFullscreen();
+        }
+
+        // Intento de fijar horizontal en dispositivos que lo soportan (Android/Chrome)
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+        document.getElementById('btn-fs').textContent = "✕ Salir";
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+        document.getElementById('btn-fs').textContent = "⛶ Completa";
+      }
+    }
 
     function getTargetAltAz(targetId, date, lat, lon, elev) {
       if (typeof Astronomy !== 'undefined') {
@@ -601,7 +641,6 @@
       }
     }
 
-    // GESTIÓN DE SENSORES EN HORIZONTAL
     function handleOrientation(event) {
       let screenAngle = 0;
       if (window.screen && window.screen.orientation) {
@@ -612,7 +651,6 @@
 
       let heading = null;
       if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
-        // En iOS se compensa el ángulo de rotación de pantalla
         heading = (event.webkitCompassHeading + screenAngle) % 360;
       } else if (event.alpha !== null) {
         heading = ((360 - event.alpha) + screenAngle) % 360;
@@ -625,14 +663,13 @@
         document.getElementById('compass-dial').style.transform = `rotate(${-heading}deg)`;
       }
 
-      // En horizontal, la elevación hacia el cielo la mide el eje gamma
       let pitch = null;
       if (screenAngle === 90) {
-        pitch = event.gamma; // Giro a la izquierda
+        pitch = event.gamma;
       } else if (screenAngle === -90 || screenAngle === 270) {
-        pitch = -event.gamma; // Giro a la derecha
+        pitch = -event.gamma;
       } else {
-        pitch = event.beta; // Modo vertical de respaldo
+        pitch = event.beta;
       }
 
       if (pitch !== null && pitch !== undefined) {
@@ -651,14 +688,14 @@
           .then(permissionState => {
             if (permissionState === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation, true);
-              btn.textContent = "Sensores Activos ✓";
+              btn.textContent = "Activo ✓";
               btn.style.background = "#22c55e";
             }
           })
-          .catch(err => alert("Error al solicitar sensor: " + err));
+          .catch(err => alert("Error sensor: " + err));
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
-        btn.textContent = "Sensores Activos ✓";
+        btn.textContent = "Activo ✓";
         btn.style.background = "#22c55e";
       }
 
