@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Localizador Celeste - Horizontal</title>
+  <title>Localizador Celeste - Horizontal Calibrado</title>
   
   <!-- Motor de efemérides astronómicas de alta precisión -->
   <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
@@ -38,6 +38,7 @@
       align-items: center;
       padding: 8px 12px;
       overflow-x: hidden;
+      user-select: none;
     }
 
     .container {
@@ -49,7 +50,7 @@
       align-items: stretch;
     }
 
-    /* Columna Izquierda: Configuración y Controles */
+    /* Columna Izquierda: Controles y Datos */
     .col-left {
       display: flex;
       flex-direction: column;
@@ -338,7 +339,7 @@
     <div class="col-left">
       <div class="panel header-box">
         <h1>Localizador Celeste</h1>
-        <div class="subtitle">Modo Horizontal</div>
+        <div class="subtitle">Modo Horizontal (Compensación 3D)</div>
       </div>
 
       <div class="panel">
@@ -402,6 +403,7 @@
   </div>
 
   <script>
+    // 1. Catálogo de Estrellas de referencia
     const BRIGHT_STARS_DATA = [
       { id: "STAR_Polaris", name: "Polaris", con: "UMi", ra: 2.530, dec: 89.26 },
       { id: "STAR_Vega", name: "Vega", con: "Lyr", ra: 18.615, dec: 38.78 },
@@ -417,6 +419,7 @@
       { id: "STAR_Spica", name: "Espiga", con: "Vir", ra: 13.420, dec: -11.16 }
     ];
 
+    // 2. Sistema Solar
     const SOLAR_SYSTEM_DATA = [
       { id: "PLANET_Moon", name: "Luna", body: "Moon" },
       { id: "PLANET_Mercury", name: "Mercurio", body: "Mercury" },
@@ -428,14 +431,118 @@
       { id: "PLANET_Neptune", name: "Neptuno", body: "Neptune" }
     ];
 
+    // 3. Catálogo Messier
     const MESSIER_DATA = [
       { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", ra: 5.575, dec: 22.01 },
+      { id: "M2", name: "Cúmulo globular", con: "Aqr", ra: 21.558, dec: -0.82 },
+      { id: "M3", name: "Cúmulo globular", con: "CVn", ra: 13.703, dec: 28.38 },
+      { id: "M4", name: "Cúmulo globular", con: "Sco", ra: 16.393, dec: -26.53 },
+      { id: "M5", name: "Cúmulo globular", con: "Ser", ra: 15.309, dec: 2.08 },
+      { id: "M6", name: "Cúmulo de la Mariposa", con: "Sco", ra: 17.668, dec: -32.22 },
+      { id: "M7", name: "Cúmulo de Ptolomeo", con: "Sco", ra: 17.898, dec: -34.82 },
+      { id: "M8", name: "Nebulosa de la Laguna", con: "Sgr", ra: 18.063, dec: -24.38 },
+      { id: "M9", name: "Cúmulo globular", con: "Oph", ra: 17.320, dec: -18.52 },
+      { id: "M10", name: "Cúmulo globular", con: "Oph", ra: 16.952, dec: -4.10 },
+      { id: "M11", name: "Cúmulo del Pato Salvaje", con: "Sct", ra: 18.852, dec: -6.27 },
+      { id: "M12", name: "Cúmulo globular", con: "Oph", ra: 16.787, dec: -1.95 },
       { id: "M13", name: "Gran Cúmulo de Hércules", con: "Her", ra: 16.695, dec: 36.46 },
+      { id: "M14", name: "Cúmulo globular", con: "Oph", ra: 17.627, dec: -3.25 },
+      { id: "M15", name: "Cúmulo globular", con: "Peg", ra: 21.500, dec: 12.17 },
+      { id: "M16", name: "Nebulosa del Águila", con: "Ser", ra: 18.313, dec: -13.79 },
+      { id: "M17", name: "Nebulosa Omega", con: "Sgr", ra: 18.347, dec: -16.18 },
+      { id: "M18", name: "Cúmulo abierto", con: "Sgr", ra: 18.332, dec: -17.13 },
+      { id: "M19", name: "Cúmulo globular", con: "Oph", ra: 17.043, dec: -26.27 },
+      { id: "M20", name: "Nebulosa Trífida", con: "Sgr", ra: 18.038, dec: -23.03 },
+      { id: "M21", name: "Cúmulo abierto", con: "Sgr", ra: 18.077, dec: -22.50 },
+      { id: "M22", name: "Cúmulo globular", con: "Sgr", ra: 18.607, dec: -23.90 },
+      { id: "M23", name: "Cúmulo abierto", con: "Sgr", ra: 17.948, dec: -19.02 },
+      { id: "M24", name: "Nube Estelar de Sagitario", con: "Sgr", ra: 18.283, dec: -18.55 },
+      { id: "M25", name: "Cúmulo abierto", con: "Sgr", ra: 18.527, dec: -19.12 },
+      { id: "M26", name: "Cúmulo abierto", con: "Sct", ra: 18.753, dec: -9.40 },
+      { id: "M27", name: "Nebulosa Dumbbell", con: "Vul", ra: 19.993, dec: 22.72 },
+      { id: "M28", name: "Cúmulo globular", con: "Sgr", ra: 18.409, dec: -24.87 },
+      { id: "M29", name: "Cúmulo abierto", con: "Cyg", ra: 20.398, dec: 38.53 },
+      { id: "M30", name: "Cúmulo globular", con: "Cap", ra: 21.673, dec: -23.18 },
       { id: "M31", name: "Galaxia de Andrómeda", con: "And", ra: 0.712, dec: 41.27 },
+      { id: "M32", name: "Satélite de Andrómeda", con: "And", ra: 0.712, dec: 40.87 },
+      { id: "M33", name: "Galaxia del Triángulo", con: "Tri", ra: 1.564, dec: 30.65 },
+      { id: "M34", name: "Cúmulo abierto", con: "Per", ra: 2.701, dec: 42.78 },
+      { id: "M35", name: "Cúmulo abierto", con: "Gem", ra: 6.148, dec: 24.33 },
+      { id: "M36", name: "Cúmulo abierto", con: "Aur", ra: 5.602, dec: 34.14 },
+      { id: "M37", name: "Cúmulo abierto", con: "Aur", ra: 5.873, dec: 32.55 },
+      { id: "M38", name: "Cúmulo abierto", con: "Aur", ra: 5.478, dec: 35.85 },
+      { id: "M39", name: "Cúmulo abierto", con: "Cyg", ra: 21.537, dec: 48.43 },
+      { id: "M40", name: "Winnecke 4", con: "UMa", ra: 12.370, dec: 58.08 },
+      { id: "M41", name: "Cúmulo abierto", con: "CMa", ra: 6.783, dec: -20.73 },
       { id: "M42", name: "Nebulosa de Orión", con: "Ori", ra: 5.588, dec: -5.39 },
+      { id: "M43", name: "Nebulosa de De Mairan", con: "Ori", ra: 5.592, dec: -5.27 },
+      { id: "M44", name: "El Pesebre", con: "Cnc", ra: 8.673, dec: 19.67 },
       { id: "M45", name: "Las Pléyades", con: "Tau", ra: 3.790, dec: 24.11 },
+      { id: "M46", name: "Cúmulo abierto", con: "Pup", ra: 7.697, dec: -14.82 },
+      { id: "M47", name: "Cúmulo abierto", con: "Pup", ra: 7.610, dec: -14.50 },
+      { id: "M48", name: "Cúmulo abierto", con: "Hya", ra: 8.230, dec: -5.80 },
+      { id: "M49", name: "Galaxia elíptica", con: "Vir", ra: 12.496, dec: 8.00 },
+      { id: "M50", name: "Cúmulo abierto", con: "Mon", ra: 7.053, dec: -8.37 },
       { id: "M51", name: "Galaxia Remolino", con: "CVn", ra: 13.498, dec: 47.19 },
-      { id: "M57", name: "Nebulosa del Anillo", con: "Lyr", ra: 18.893, dec: 33.03 }
+      { id: "M52", name: "Cúmulo abierto", con: "Cas", ra: 23.403, dec: 61.59 },
+      { id: "M53", name: "Cúmulo globular", con: "Com", ra: 13.215, dec: 18.17 },
+      { id: "M54", name: "Cúmulo globular", con: "Sgr", ra: 18.918, dec: -30.48 },
+      { id: "M55", name: "Cúmulo globular", con: "Sgr", ra: 19.667, dec: -30.96 },
+      { id: "M56", name: "Cúmulo globular", con: "Lyr", ra: 19.277, dec: 30.18 },
+      { id: "M57", name: "Nebulosa del Anillo", con: "Lyr", ra: 18.893, dec: 33.03 },
+      { id: "M58", name: "Galaxia espiral", con: "Vir", ra: 12.628, dec: 11.82 },
+      { id: "M59", name: "Galaxia elíptica", con: "Vir", ra: 12.700, dec: 11.65 },
+      { id: "M60", name: "Galaxia elíptica", con: "Vir", ra: 12.728, dec: 11.55 },
+      { id: "M61", name: "Galaxia espiral", con: "Vir", ra: 12.366, dec: 4.47 },
+      { id: "M62", name: "Cúmulo globular", con: "Oph", ra: 17.020, dec: -30.11 },
+      { id: "M63", name: "Galaxia del Girasol", con: "CVn", ra: 13.264, dec: 42.03 },
+      { id: "M64", name: "Galaxia Ojo Negro", con: "Com", ra: 12.945, dec: 21.68 },
+      { id: "M65", name: "Triplete de Leo", con: "Leo", ra: 11.315, dec: 13.09 },
+      { id: "M66", name: "Triplete de Leo", con: "Leo", ra: 11.337, dec: 12.99 },
+      { id: "M67", name: "Cúmulo abierto", con: "Cnc", ra: 8.847, dec: 11.82 },
+      { id: "M68", name: "Cúmulo globular", con: "Hya", ra: 12.658, dec: -26.75 },
+      { id: "M69", name: "Cúmulo globular", con: "Sgr", ra: 18.523, dec: -32.35 },
+      { id: "M70", name: "Cúmulo globular", con: "Sgr", ra: 18.720, dec: -32.30 },
+      { id: "M71", name: "Cúmulo globular", con: "Sge", ra: 19.897, dec: 18.78 },
+      { id: "M72", name: "Cúmulo globular", con: "Aqr", ra: 20.892, dec: -12.54 },
+      { id: "M73", name: "Asterismo", con: "Aqr", ra: 20.982, dec: -12.63 },
+      { id: "M74", name: "Galaxia espiral", con: "Psc", ra: 1.611, dec: 15.78 },
+      { id: "M75", name: "Cúmulo globular", con: "Sgr", ra: 20.102, dec: -21.92 },
+      { id: "M76", name: "Pequeña Dumbbell", con: "Per", ra: 1.706, dec: 51.58 },
+      { id: "M77", name: "Cetus A", con: "Cet", ra: 2.711, dec: -0.01 },
+      { id: "M78", name: "Nebulosa difusa", con: "Ori", ra: 5.779, dec: 0.08 },
+      { id: "M79", name: "Cúmulo globular", con: "Lep", ra: 5.409, dec: -24.52 },
+      { id: "M80", name: "Cúmulo globular", con: "Sco", ra: 16.284, dec: -22.97 },
+      { id: "M81", name: "Galaxia de Bode", con: "UMa", ra: 9.926, dec: 69.07 },
+      { id: "M82", name: "Galaxia del Cigarro", con: "UMa", ra: 9.931, dec: 69.68 },
+      { id: "M83", name: "Molinillo Austral", con: "Hya", ra: 13.617, dec: -29.87 },
+      { id: "M84", name: "Galaxia lenticular", con: "Vir", ra: 12.418, dec: 12.89 },
+      { id: "M85", name: "Galaxia lenticular", con: "Com", ra: 12.423, dec: 18.19 },
+      { id: "M86", name: "Galaxia lenticular", con: "Vir", ra: 12.436, dec: 12.95 },
+      { id: "M87", name: "Virgo A", con: "Vir", ra: 12.514, dec: 12.39 },
+      { id: "M88", name: "Galaxia espiral", con: "Com", ra: 12.533, dec: 14.42 },
+      { id: "M89", name: "Galaxia elíptica", con: "Vir", ra: 12.594, dec: 12.56 },
+      { id: "M90", name: "Galaxia espiral", con: "Vir", ra: 12.614, dec: 13.16 },
+      { id: "M91", name: "Galaxia espiral", con: "Com", ra: 12.590, dec: 14.50 },
+      { id: "M92", name: "Cúmulo globular", con: "Her", ra: 17.285, dec: 43.14 },
+      { id: "M93", name: "Cúmulo abierto", con: "Pup", ra: 7.743, dec: -23.85 },
+      { id: "M94", name: "Galaxia espiral", con: "CVn", ra: 12.848, dec: 41.12 },
+      { id: "M95", name: "Galaxia espiral", con: "Leo", ra: 10.733, dec: 11.70 },
+      { id: "M96", name: "Galaxia espiral", con: "Leo", ra: 10.779, dec: 11.82 },
+      { id: "M97", name: "Nebulosa del Búho", con: "UMa", ra: 11.247, dec: 55.02 },
+      { id: "M98", name: "Galaxia espiral", con: "Com", ra: 12.230, dec: 14.90 },
+      { id: "M99", name: "Galaxia espiral", con: "Com", ra: 12.314, dec: 14.42 },
+      { id: "M100", name: "Galaxia espiral", con: "Com", ra: 12.382, dec: 15.82 },
+      { id: "M101", name: "Galaxia del Molinillo", con: "UMa", ra: 14.053, dec: 54.35 },
+      { id: "M102", name: "Galaxia del Huso", con: "Dra", ra: 15.110, dec: 55.76 },
+      { id: "M103", name: "Cúmulo abierto", con: "Cas", ra: 1.553, dec: 60.70 },
+      { id: "M104", name: "Galaxia del Sombrero", con: "Vir", ra: 12.666, dec: -11.62 },
+      { id: "M105", name: "Galaxia elíptica", con: "Leo", ra: 10.797, dec: 12.58 },
+      { id: "M106", name: "Galaxia espiral", con: "CVn", ra: 12.316, dec: 47.30 },
+      { id: "M107", name: "Cúmulo globular", con: "Oph", ra: 16.542, dec: -13.05 },
+      { id: "M108", name: "Galaxia espiral", con: "UMa", ra: 11.192, dec: 55.67 },
+      { id: "M109", name: "Galaxia espiral", con: "UMa", ra: 11.960, dec: 53.37 },
+      { id: "M110", name: "Satélite de Andrómeda", con: "And", ra: 0.673, dec: 41.68 }
     ];
 
     let userLat = 37.18;
@@ -492,7 +599,7 @@
       const now = new Date();
 
       const groups = [
-        { label: "⭐ Estrellas Guía", data: BRIGHT_STARS_DATA },
+        { label: "⭐ Estrellas Guía y Calibración", data: BRIGHT_STARS_DATA },
         { label: "🪐 Planetas y Luna", data: SOLAR_SYSTEM_DATA },
         { label: "🌌 Catálogo Messier", data: MESSIER_DATA }
       ];
@@ -600,6 +707,7 @@
       }
     }
 
+    // GESTIÓN DE ORIENTACIÓN CON PROYECCIÓN VECTORIAL 3D
     function handleOrientation(event) {
       let screenAngle = 0;
       if (window.screen && window.screen.orientation) {
@@ -608,6 +716,7 @@
         screenAngle = window.orientation;
       }
 
+      // Rumbo en azimut compensado por la rotación de pantalla
       let heading = null;
       if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
         heading = (event.webkitCompassHeading + screenAngle) % 360;
@@ -622,19 +731,26 @@
         document.getElementById('compass-dial').style.transform = `rotate(${-heading}deg)`;
       }
 
-      let pitch = null;
-      if (screenAngle === 90) {
-        pitch = event.gamma;
-      } else if (screenAngle === -90 || screenAngle === 270) {
-        pitch = -event.gamma;
+      // Proyección vectorial 3D de la gravedad terrestre
+      const betaRad = (event.beta || 0) * (Math.PI / 180);
+      const gammaRad = (event.gamma || 0) * (Math.PI / 180);
+
+      const x = Math.cos(betaRad) * Math.sin(gammaRad);
+      const y = Math.sin(betaRad);
+      const z = Math.cos(betaRad) * Math.cos(gammaRad);
+
+      let pitch = 0;
+
+      // Detección de orientación apaisada
+      if (Math.abs(screenAngle) === 90 || screenAngle === 270) {
+        const sign = screenAngle === 90 ? 1 : -1;
+        pitch = Math.atan2(sign * x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
       } else {
-        pitch = event.beta;
+        pitch = Math.atan2(y, Math.sqrt(x * x + z * z)) * (180 / Math.PI);
       }
 
-      if (pitch !== null && pitch !== undefined) {
-        currentSensorPitch = pitch;
-        document.getElementById('disp-sensor-pitch').textContent = `${pitch.toFixed(1)}°`;
-      }
+      currentSensorPitch = pitch;
+      document.getElementById('disp-sensor-pitch').textContent = `${pitch.toFixed(1)}°`;
 
       checkAlignment();
     }
@@ -651,7 +767,7 @@
               btn.style.background = "#22c55e";
             }
           })
-          .catch(err => alert("Error al solicitar sensor: " + err));
+          .catch(err => alert("Error sensor: " + err));
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
         btn.textContent = "Sensores Activos ✓";
