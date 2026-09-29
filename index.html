@@ -2,12 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Localizador Celeste - Horizontal Calibrado</title>
-  
-  <!-- Motor de efemérides astronómicas de alta precisión -->
-  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localizador Messier (M1 - M110) - Trípode 90°</title>
   <style>
     :root {
       --bg: #070b12;
@@ -19,7 +15,6 @@
       --green: #22c55e;
       --orange: #f97316;
       --yellow: #facc15;
-      --red: #ef4444;
     }
 
     * {
@@ -32,60 +27,40 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      padding: 8px 12px;
-      overflow-x: hidden;
-      user-select: none;
+      padding: 16px 14px;
+      min-height: 100vh;
     }
 
     .container {
       width: 100%;
-      max-width: 900px;
-      display: grid;
-      grid-template-columns: 1fr 1.25fr;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
-      align-items: stretch;
     }
 
-    /* Columna Izquierda: Controles y Datos */
-    .col-left {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      justify-content: space-between;
+    h1 {
+      color: var(--accent);
+      font-size: 1.35rem;
+      text-align: center;
+      margin-bottom: 2px;
     }
 
-    /* Columna Derecha: Brújula e Indicador de Tiro */
-    .col-right {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      justify-content: center;
+    .subtitle {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
     }
 
     .panel {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .header-box {
-      text-align: left;
-    }
-
-    h1 {
-      color: var(--accent);
-      font-size: 1.15rem;
-      line-height: 1.2;
-    }
-
-    .subtitle {
-      font-size: 0.68rem;
-      color: var(--text-muted);
+      border-radius: 12px;
+      padding: 14px;
     }
 
     .btn-action {
@@ -93,10 +68,10 @@
       background: var(--accent);
       color: #031326;
       border: none;
-      padding: 10px;
-      font-size: 0.88rem;
+      padding: 12px;
+      font-size: 0.95rem;
       font-weight: 700;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -105,46 +80,40 @@
     }
 
     .status-gps {
-      font-size: 0.7rem;
+      text-align: center;
+      font-size: 0.78rem;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 8px;
     }
 
     .filter-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .label-title {
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
     }
 
-    .segmented-control {
-      display: flex;
-      background: #090d16;
-      border-radius: 6px;
-      padding: 2px;
+    .btn-chip {
+      background: #1e293b;
       border: 1px solid #334155;
-    }
-
-    .seg-btn {
-      background: transparent;
-      border: none;
       color: var(--text-muted);
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
       cursor: pointer;
+      font-weight: 600;
     }
 
-    .seg-btn.active {
+    .btn-chip.active {
       background: #0284c7;
+      border-color: var(--accent);
       color: #fff;
     }
 
@@ -153,150 +122,113 @@
       background: #090d16;
       color: #fff;
       border: 1px solid #334155;
-      padding: 6px 8px;
-      font-size: 0.82rem;
-      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.92rem;
+      border-radius: 8px;
       outline: none;
     }
 
-    optgroup {
-      background: #0f1724;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    option {
-      background: #090d16;
-      color: #fff;
-    }
-
-    /* Brújula */
-    .compass-wrapper {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      margin: 0 auto;
-    }
-
-    .compass-dial {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: radial-gradient(circle, #0b111e 60%, #070b12 100%);
-      border: 2px solid #334155;
-      box-shadow: 0 0 12px rgba(0,0,0,0.6);
-      position: relative;
-      transition: transform 0.08s linear;
-    }
-
-    .compass-tick {
-      position: absolute;
-      width: 2px;
-      height: 8px;
-      background: #475569;
-      left: calc(50% - 1px);
-      top: 4px;
-      transform-origin: 50% 76px;
-    }
-
-    .compass-label {
-      position: absolute;
-      width: 16px;
-      font-size: 10px;
-      font-weight: 800;
-      color: var(--text-muted);
+    .section-title {
       text-align: center;
-      left: calc(50% - 8px);
-    }
-
-    .compass-label.north { top: 14px; color: var(--red); }
-    .compass-label.east { right: 14px; left: auto; top: calc(50% - 6px); }
-    .compass-label.south { bottom: 14px; left: calc(50% - 8px); }
-    .compass-label.west { left: 14px; top: calc(50% - 6px); }
-
-    .compass-needle-fixed {
-      position: absolute;
-      top: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 12px solid var(--accent);
-      z-index: 10;
-    }
-
-    .target-pointer {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      transform-origin: center center;
-    }
-
-    .target-dot {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 12px;
-      height: 12px;
-      background: var(--orange);
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 0 8px var(--orange);
-    }
-
-    .compass-center-info {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      pointer-events: none;
-    }
-
-    .heading-val {
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: #fff;
-      line-height: 1;
-    }
-
-    .heading-unit {
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      margin-top: 2px;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
     }
 
-    .info-summary {
+    /* Caja del Trípode con el Gráfico a la Derecha */
+    .tripod-box {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
       display: flex;
-      justify-content: space-around;
-      background: #090d16;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tripod-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .tripod-val {
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: var(--orange);
+      line-height: 1.05;
+      margin: 2px 0;
+    }
+
+    .tripod-sector {
+      font-size: 0.88rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Gráfico circular de sectores */
+    .quadrant-widget {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    .q-sector {
+      fill: #1e293b;
+      stroke: #090d16;
+      stroke-width: 2;
+      transition: fill 0.25s, filter 0.25s;
+    }
+
+    .q-sector.active {
+      fill: var(--orange);
+      filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7));
+    }
+
+    .q-cardinal {
+      font-size: 8px;
+      fill: #94a3b8;
+      font-weight: 800;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .coords-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .coord-box {
+      background: #070b12;
       border: 1px solid #1e293b;
-      border-radius: 6px;
-      padding: 6px;
+      border-radius: 8px;
+      padding: 10px;
       text-align: center;
     }
 
-    .info-col-label {
-      font-size: 0.62rem;
+    .coord-label {
+      font-size: 0.68rem;
       color: var(--text-muted);
       text-transform: uppercase;
+      margin-bottom: 4px;
     }
 
-    .info-col-val {
-      font-size: 0.95rem;
+    .coord-val {
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--accent);
     }
 
-    .info-col-val.target-color {
-      color: var(--orange);
+    .sensor-reading {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
     }
 
     .target-banner {
@@ -304,10 +236,10 @@
       border: 1px solid #1f2937;
       color: var(--yellow);
       text-align: center;
-      padding: 8px 6px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 800;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1.15rem;
+      font-weight: 900;
       text-transform: uppercase;
       transition: background 0.2s, color 0.2s;
     }
@@ -317,121 +249,83 @@
       border-color: #22c55e;
       color: #86efac;
     }
-
-    @media (orientation: portrait) {
-      .container {
-        grid-template-columns: 1fr;
-      }
-      .compass-wrapper {
-        width: 190px;
-        height: 190px;
-      }
-      .compass-tick {
-        transform-origin: 50% 91px;
-      }
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- COLUMNA IZQUIERDA -->
-    <div class="col-left">
-      <div class="panel header-box">
-        <h1>Localizador Celeste</h1>
-        <div class="subtitle">Modo Horizontal (Compensación 3D)</div>
-      </div>
+    <h1>Localizador Messier (M1 - M110)</h1>
+    <div class="subtitle">Alineación: Marca 0° del trípode al Norte exacto</div>
 
-      <div class="panel">
-        <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Brújula y Sensores</button>
-        <div class="status-gps" id="gps-status">Esperando activación...</div>
-      </div>
-
-      <div class="panel">
-        <div class="filter-row">
-          <span class="label-title">Objetivo:</span>
-          <div class="segmented-control">
-            <button class="seg-btn active" id="btn-vis" onclick="setFilter(true)">Visibles</button>
-            <button class="seg-btn" id="btn-all" onclick="setFilter(false)">Todos</button>
-          </div>
-        </div>
-        <select id="object-select" onchange="updateCalculations()"></select>
-      </div>
-
-      <div class="info-summary panel">
-        <div>
-          <div class="info-col-label">Objeto (Az / Alt)</div>
-          <div class="info-col-val target-color" id="disp-target-coords">--° / --°</div>
-        </div>
-        <div>
-          <div class="info-col-label">Inclinación</div>
-          <div class="info-col-val" id="disp-sensor-pitch">--°</div>
-        </div>
-        <div>
-          <div class="info-col-label">Giro Requerido</div>
-          <div class="info-col-val" id="disp-turn">--°</div>
-        </div>
-      </div>
+    <div class="panel">
+      <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Sensor y Audio</button>
+      <div class="status-gps" id="gps-status">Lat: 37.18° N, Lon: -5.78° O (Esperando activación...)</div>
     </div>
 
-    <!-- COLUMNA DERECHA -->
-    <div class="col-right">
-      <div class="panel" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <div class="compass-wrapper">
-          <div class="compass-needle-fixed"></div>
-
-          <div class="compass-dial" id="compass-dial">
-            <div class="compass-label north">N</div>
-            <div class="compass-label east">E</div>
-            <div class="compass-label south">S</div>
-            <div class="compass-label west">O</div>
-
-            <div class="target-pointer" id="target-pointer">
-              <div class="target-dot" title="Posición del Objeto"></div>
-            </div>
-          </div>
-
-          <div class="compass-center-info">
-            <div class="heading-val" id="disp-heading">--°</div>
-            <div class="heading-unit" id="disp-cardinal-dir">RUMBO</div>
-          </div>
-        </div>
-
-        <div class="target-banner" id="banner-status" style="width: 100%;">ACTIVA SENSORES</div>
+    <div class="panel">
+      <div class="filter-row">
+        <span class="label-title">Selecciona Objeto:</span>
+        <button class="btn-chip active" id="filter-btn" onclick="toggleOnlyVisible()">Solo Visibles</button>
       </div>
+      <select id="object-select" onchange="updateCalculations()"></select>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">Coordenadas en Vivo del Objeto</div>
+
+      <!-- Marca para Trípode + Gráfico Circular de 4 Cuadrantes -->
+      <div class="tripod-box">
+        <div class="tripod-info">
+          <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
+          <div class="tripod-val" id="disp-tripod">--°</div>
+          <div class="tripod-sector" id="disp-sector">Esperando selección</div>
+        </div>
+        
+        <!-- Esfera con 4 sectores -->
+        <svg class="quadrant-widget" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="#0b0f17" stroke="#334155" stroke-width="1.5" />
+          
+          <!-- Cuadrante 4: Arriba-Izquierda (Oeste -> Norte) -->
+          <path id="sec-4" class="q-sector" d="M 50 50 L 50 8 A 42 42 0 0 0 8 50 Z" />
+          
+          <!-- Cuadrante 1: Arriba-Derecha (Norte -> Este) -->
+          <path id="sec-1" class="q-sector" d="M 50 50 L 92 50 A 42 42 0 0 0 50 8 Z" />
+          
+          <!-- Cuadrante 2: Abajo-Derecha (Este -> Sur) -->
+          <path id="sec-2" class="q-sector" d="M 50 50 L 50 92 A 42 42 0 0 0 92 50 Z" />
+          
+          <!-- Cuadrante 3: Abajo-Izquierda (Sur -> Oeste) -->
+          <path id="sec-3" class="q-sector" d="M 50 50 L 8 50 A 42 42 0 0 0 50 92 Z" />
+          
+          <!-- Centro y letras cardinales -->
+          <circle cx="50" cy="50" r="7" fill="#090d16" stroke="#475569" stroke-width="1" />
+          <text x="50" y="16" class="q-cardinal">N</text>
+          <text x="84" y="50" class="q-cardinal">E</text>
+          <text x="50" y="84" class="q-cardinal">S</text>
+          <text x="16" y="50" class="q-cardinal">O</text>
+        </svg>
+      </div>
+
+      <div class="coords-grid">
+        <div class="coord-box">
+          <div class="coord-label">Azimut 360°</div>
+          <div class="coord-val" id="disp-az">--°</div>
+        </div>
+        <div class="coord-box">
+          <div class="coord-label">Altitud Teórica</div>
+          <div class="coord-val" id="disp-alt">--°</div>
+        </div>
+      </div>
+
+      <div class="sensor-reading">
+        Elevación actual del sensor: <strong id="disp-sensor">--°</strong>
+      </div>
+
+      <div class="target-banner" id="banner-status">INCLINA EL TUBO</div>
     </div>
   </div>
 
   <script>
-    // 1. Catálogo de Estrellas de referencia
-    const BRIGHT_STARS_DATA = [
-      { id: "STAR_Polaris", name: "Polaris", con: "UMi", ra: 2.530, dec: 89.26 },
-      { id: "STAR_Vega", name: "Vega", con: "Lyr", ra: 18.615, dec: 38.78 },
-      { id: "STAR_Altair", name: "Altair", con: "Aql", ra: 19.846, dec: 8.87 },
-      { id: "STAR_Deneb", name: "Deneb", con: "Cyg", ra: 20.690, dec: 45.28 },
-      { id: "STAR_Sirius", name: "Sirio", con: "CMa", ra: 6.752, dec: -16.72 },
-      { id: "STAR_Betelgeuse", name: "Betelgeuse", con: "Ori", ra: 5.919, dec: 7.41 },
-      { id: "STAR_Rigel", name: "Rigel", con: "Ori", ra: 5.242, dec: -8.20 },
-      { id: "STAR_Arcturus", name: "Arturo", con: "Boo", ra: 14.261, dec: 19.18 },
-      { id: "STAR_Aldebaran", name: "Aldebarán", con: "Tau", ra: 4.598, dec: 16.51 },
-      { id: "STAR_Capella", name: "Capella", con: "Aur", ra: 5.278, dec: 45.99 },
-      { id: "STAR_Antares", name: "Antares", con: "Sco", ra: 16.490, dec: -26.43 },
-      { id: "STAR_Spica", name: "Espiga", con: "Vir", ra: 13.420, dec: -11.16 }
-    ];
-
-    // 2. Sistema Solar
-    const SOLAR_SYSTEM_DATA = [
-      { id: "PLANET_Moon", name: "Luna", body: "Moon" },
-      { id: "PLANET_Mercury", name: "Mercurio", body: "Mercury" },
-      { id: "PLANET_Venus", name: "Venus", body: "Venus" },
-      { id: "PLANET_Mars", name: "Marte", body: "Mars" },
-      { id: "PLANET_Jupiter", name: "Júpiter", body: "Jupiter" },
-      { id: "PLANET_Saturn", name: "Saturno", body: "Saturn" },
-      { id: "PLANET_Uranus", name: "Urano", body: "Uranus" },
-      { id: "PLANET_Neptune", name: "Neptuno", body: "Neptune" }
-    ];
-
-    // 3. Catálogo Messier
     const MESSIER_DATA = [
       { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", ra: 5.575, dec: 22.01 },
       { id: "M2", name: "Cúmulo globular", con: "Aqr", ra: 21.558, dec: -0.82 },
@@ -449,7 +343,7 @@
       { id: "M14", name: "Cúmulo globular", con: "Oph", ra: 17.627, dec: -3.25 },
       { id: "M15", name: "Cúmulo globular", con: "Peg", ra: 21.500, dec: 12.17 },
       { id: "M16", name: "Nebulosa del Águila", con: "Ser", ra: 18.313, dec: -13.79 },
-      { id: "M17", name: "Nebulosa Omega", con: "Sgr", ra: 18.347, dec: -16.18 },
+      { id: "M17", name: "Nebulosa Omega / Cisne", con: "Sgr", ra: 18.347, dec: -16.18 },
       { id: "M18", name: "Cúmulo abierto", con: "Sgr", ra: 18.332, dec: -17.13 },
       { id: "M19", name: "Cúmulo globular", con: "Oph", ra: 17.043, dec: -26.27 },
       { id: "M20", name: "Nebulosa Trífida", con: "Sgr", ra: 18.038, dec: -23.03 },
@@ -547,48 +441,82 @@
 
     let userLat = 37.18;
     let userLon = -5.78;
-    let userElevation = 0;
     let onlyVisible = true;
-    let currentAzTarget = null;
     let currentAltTarget = null;
-    let currentCompassHeading = null;
     let currentSensorPitch = null;
     let audioCtx = null;
     let lastBeep = 0;
 
-    function getTargetAltAz(targetId, date, lat, lon, elev) {
-      if (typeof Astronomy !== 'undefined') {
-        const observer = new Astronomy.Observer(lat, lon, elev);
-        if (targetId.startsWith("PLANET_")) {
-          const bodyKey = targetId.replace("PLANET_", "");
-          const equ2000 = Astronomy.Equator(bodyKey, date, observer, true, true);
-          const hor = Astronomy.Horizon(date, observer, equ2000.ra, equ2000.dec, 'normal');
-          return { az: hor.azimuth, alt: hor.altitude };
-        }
-        if (targetId.startsWith("STAR_")) {
-          const star = BRIGHT_STARS_DATA.find(s => s.id === targetId);
-          if (star) {
-            const hor = Astronomy.Horizon(date, observer, star.ra, star.dec, 'normal');
-            return { az: hor.azimuth, alt: hor.altitude };
-          }
-        }
-        const obj = MESSIER_DATA.find(o => o.id === targetId);
-        if (obj) {
-          const hor = Astronomy.Horizon(date, observer, obj.ra, obj.dec, 'normal');
-          return { az: hor.azimuth, alt: hor.altitude };
-        }
-      }
-      return { az: 0, alt: -90 };
+    function getLST(now, lon) {
+      const jd = (now.getTime() / 86400000) + 2440587.5;
+      const d = jd - 2451545.0;
+      let gmst = 18.697374558 + 24.06570982441908 * d;
+      gmst = ((gmst % 24) + 24) % 24;
+      let lst = gmst + (lon / 15.0);
+      return ((lst % 24) + 24) % 24;
     }
 
-    function buildCompassTicks() {
-      const dial = document.getElementById('compass-dial');
-      for (let i = 0; i < 360; i += 30) {
-        if (i % 90 === 0) continue;
-        const tick = document.createElement('div');
-        tick.className = 'compass-tick';
-        tick.style.transform = `rotate(${i}deg)`;
-        dial.appendChild(tick);
+    function raDecToAltAz(ra, dec, lat, lst) {
+      const d2r = Math.PI / 180;
+      const r2d = 180 / Math.PI;
+
+      let ha = (lst - ra) * 15.0;
+      ha = ((ha % 360) + 360) % 360;
+
+      const phi = lat * d2r;
+      const delta = dec * d2r;
+      const H = ha * d2r;
+
+      const sinAlt = Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H);
+      const alt = Math.asin(sinAlt);
+
+      const cosAz = (Math.sin(delta) - Math.sin(phi) * Math.sin(alt)) / (Math.cos(phi) * Math.cos(alt));
+      let az = Math.acos(Math.max(-1, Math.min(1, cosAz))) * r2d;
+      if (Math.sin(H) > 0) az = 360 - az;
+
+      return { az: az, alt: alt * r2d };
+    }
+
+    function formatTripodQuadrant(az) {
+      let sector = "";
+      let dial = 0;
+      let sectorNum = 1;
+
+      if (az >= 0 && az < 90) {
+        dial = az;
+        sector = "Norte ➔ Este (1er sector)";
+        sectorNum = 1;
+      } else if (az >= 90 && az < 180) {
+        dial = az - 90;
+        sector = "Este ➔ Sur (2º sector)";
+        sectorNum = 2;
+      } else if (az >= 180 && az < 270) {
+        dial = az - 180;
+        sector = "Sur ➔ Oeste (3er sector)";
+        sectorNum = 3;
+      } else {
+        dial = az - 270;
+        sector = "Oeste ➔ Norte (4º sector)";
+        sectorNum = 4;
+      }
+
+      return {
+        dial: `${dial.toFixed(1)}°`,
+        sector: sector,
+        sectorNum: sectorNum
+      };
+    }
+
+    function updateQuadrantGraphic(sectorNum) {
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`sec-${i}`);
+        if (el) {
+          if (i === sectorNum) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
       }
     }
 
@@ -596,26 +524,18 @@
       const select = document.getElementById('object-select');
       const prevSelected = select.value;
       select.innerHTML = "";
+
       const now = new Date();
+      const lst = getLST(now, userLon);
 
-      const groups = [
-        { label: "⭐ Estrellas Guía y Calibración", data: BRIGHT_STARS_DATA },
-        { label: "🪐 Planetas y Luna", data: SOLAR_SYSTEM_DATA },
-        { label: "🌌 Catálogo Messier", data: MESSIER_DATA }
-      ];
+      MESSIER_DATA.forEach(obj => {
+        const { alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
+        if (onlyVisible && alt <= 0) return;
 
-      groups.forEach(g => {
-        const optgroup = document.createElement('optgroup');
-        optgroup.label = g.label;
-        g.data.forEach(item => {
-          const { alt } = getTargetAltAz(item.id, now, userLat, userLon, userElevation);
-          if (onlyVisible && alt <= 0) return;
-          const opt = document.createElement('option');
-          opt.value = item.id;
-          opt.textContent = `${item.name || item.id} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
-          optgroup.appendChild(opt);
-        });
-        if (optgroup.children.length > 0) select.appendChild(optgroup);
+        const opt = document.createElement('option');
+        opt.value = obj.id;
+        opt.textContent = `${obj.id} — ${obj.name ? obj.name : obj.con} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
+        select.appendChild(opt);
       });
 
       if (prevSelected && Array.from(select.options).some(o => o.value === prevSelected)) {
@@ -624,28 +544,35 @@
       updateCalculations();
     }
 
-    function setFilter(visibleOnly) {
-      onlyVisible = visibleOnly;
-      document.getElementById('btn-vis').classList.toggle('active', visibleOnly);
-      document.getElementById('btn-all').classList.toggle('active', !visibleOnly);
+    function toggleOnlyVisible() {
+      onlyVisible = !onlyVisible;
+      const btn = document.getElementById('filter-btn');
+      btn.classList.toggle('active', onlyVisible);
+      btn.textContent = onlyVisible ? "Solo Visibles" : "Mostrar Todos";
       populateSelect();
     }
 
     function updateCalculations() {
       const select = document.getElementById('object-select');
       if (!select.value) return;
-      const now = new Date();
-      const { az, alt } = getTargetAltAz(select.value, now, userLat, userLon, userElevation);
-      currentAzTarget = az;
-      currentAltTarget = alt;
-      document.getElementById('disp-target-coords').textContent = `${az.toFixed(1)}° / ${alt.toFixed(1)}°`;
-      document.getElementById('target-pointer').style.transform = `rotate(${az}deg)`;
-      checkAlignment();
-    }
 
-    function getCardinalLabel(deg) {
-      const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-      return dirs[Math.round(deg / 45) % 8];
+      const obj = MESSIER_DATA.find(o => o.id === select.value);
+      if (!obj) return;
+
+      const now = new Date();
+      const lst = getLST(now, userLon);
+      const { az, alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
+
+      currentAltTarget = alt;
+
+      const tripod = formatTripodQuadrant(az);
+      document.getElementById('disp-tripod').textContent = tripod.dial;
+      document.getElementById('disp-sector').textContent = tripod.sector;
+      document.getElementById('disp-az').textContent = `${az.toFixed(1)}°`;
+      document.getElementById('disp-alt').textContent = `${alt.toFixed(1)}°`;
+
+      updateQuadrantGraphic(tripod.sectorNum);
+      checkAlignment();
     }
 
     function playBeep(freq, duration) {
@@ -656,7 +583,7 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
       } catch (e) {}
@@ -664,24 +591,16 @@
 
     function checkAlignment() {
       const banner = document.getElementById('banner-status');
-      if (currentAzTarget === null || currentAltTarget === null || currentCompassHeading === null || currentSensorPitch === null) {
-        banner.textContent = "APUNTA EL MÓVIL";
+      if (currentAltTarget === null || currentSensorPitch === null) {
+        banner.textContent = "INCLINA EL TUBO";
         banner.classList.remove('aligned');
         return;
       }
 
-      let diffAz = (currentAzTarget - currentCompassHeading + 540) % 360 - 180;
-      let diffAlt = currentAltTarget - currentSensorPitch;
-
-      const absDiffAz = Math.abs(diffAz);
-      const absDiffAlt = Math.abs(diffAlt);
-
-      const turnLabel = diffAz > 0 ? `➔ Der ${absDiffAz.toFixed(1)}°` : `⬅ Izq ${absDiffAz.toFixed(1)}°`;
-      document.getElementById('disp-turn').textContent = turnLabel;
-
+      const diff = Math.abs(currentSensorPitch - currentAltTarget);
       const now = Date.now();
 
-      if (absDiffAz <= 2.5 && absDiffAlt <= 2.0) {
+      if (diff <= 1.0) {
         banner.textContent = "¡EN EL BLANCO! (ALINEADO)";
         banner.classList.add('aligned');
         if (now - lastBeep > 250) {
@@ -690,69 +609,26 @@
         }
       } else {
         banner.classList.remove('aligned');
-        let instructions = [];
-        if (absDiffAz > 2.5) {
-          instructions.push(diffAz > 0 ? `DER (${absDiffAz.toFixed(1)}°)` : `IZQ (${absDiffAz.toFixed(1)}°)`);
+        if (currentSensorPitch < currentAltTarget) {
+          banner.textContent = `SUBE EL TUBO (+${(currentAltTarget - currentSensorPitch).toFixed(1)}°)`;
+        } else {
+          banner.textContent = `BAJA EL TUBO (-${(currentSensorPitch - currentAltTarget).toFixed(1)}°)`;
         }
-        if (absDiffAlt > 2.0) {
-          instructions.push(diffAlt > 0 ? `SUBE (+${diffAlt.toFixed(1)}°)` : `BAJA (${diffAlt.toFixed(1)}°)`);
-        }
-        banner.textContent = instructions.join(" | ");
 
-        const combinedDiff = Math.sqrt(absDiffAz * absDiffAz + absDiffAlt * absDiffAlt);
-        if (combinedDiff < 10.0 && now - lastBeep > (combinedDiff * 70 + 80)) {
+        if (diff < 8.0 && now - lastBeep > (diff * 90 + 80)) {
           playBeep(440, 0.05);
           lastBeep = now;
         }
       }
     }
 
-    // GESTIÓN DE ORIENTACIÓN CON PROYECCIÓN VECTORIAL 3D
     function handleOrientation(event) {
-      let screenAngle = 0;
-      if (window.screen && window.screen.orientation) {
-        screenAngle = window.screen.orientation.angle || 0;
-      } else if (typeof window.orientation !== 'undefined') {
-        screenAngle = window.orientation;
+      let pitch = event.beta;
+      if (pitch !== null && pitch !== undefined) {
+        currentSensorPitch = pitch;
+        document.getElementById('disp-sensor').textContent = `${pitch.toFixed(1)}°`;
+        checkAlignment();
       }
-
-      // Rumbo en azimut compensado por la rotación de pantalla
-      let heading = null;
-      if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
-        heading = (event.webkitCompassHeading + screenAngle) % 360;
-      } else if (event.alpha !== null) {
-        heading = ((360 - event.alpha) + screenAngle) % 360;
-      }
-
-      if (heading !== null) {
-        currentCompassHeading = heading;
-        document.getElementById('disp-heading').textContent = `${Math.round(heading)}°`;
-        document.getElementById('disp-cardinal-dir').textContent = getCardinalLabel(heading);
-        document.getElementById('compass-dial').style.transform = `rotate(${-heading}deg)`;
-      }
-
-      // Proyección vectorial 3D de la gravedad terrestre
-      const betaRad = (event.beta || 0) * (Math.PI / 180);
-      const gammaRad = (event.gamma || 0) * (Math.PI / 180);
-
-      const x = Math.cos(betaRad) * Math.sin(gammaRad);
-      const y = Math.sin(betaRad);
-      const z = Math.cos(betaRad) * Math.cos(gammaRad);
-
-      let pitch = 0;
-
-      // Detección de orientación apaisada
-      if (Math.abs(screenAngle) === 90 || screenAngle === 270) {
-        const sign = screenAngle === 90 ? 1 : -1;
-        pitch = Math.atan2(sign * x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
-      } else {
-        pitch = Math.atan2(y, Math.sqrt(x * x + z * z)) * (180 / Math.PI);
-      }
-
-      currentSensorPitch = pitch;
-      document.getElementById('disp-sensor-pitch').textContent = `${pitch.toFixed(1)}°`;
-
-      checkAlignment();
     }
 
     function startApp() {
@@ -763,38 +639,48 @@
           .then(permissionState => {
             if (permissionState === 'granted') {
               window.addEventListener('deviceorientation', handleOrientation, true);
-              btn.textContent = "Sensores Activos ✓";
+              btn.textContent = "Sensores y Audio Activos ✓";
               btn.style.background = "#22c55e";
+            } else {
+              alert("Permiso de orientación denegado.");
             }
           })
-          .catch(err => alert("Error sensor: " + err));
+          .catch(err => {
+            alert("Error al solicitar sensor: " + err);
+          });
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
-        btn.textContent = "Sensores Activos ✓";
+        btn.textContent = "Sensores y Audio Activos ✓";
         btn.style.background = "#22c55e";
       }
 
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      } catch (e) {}
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      } catch (e) {
+        console.warn("Audio no iniciado", e);
+      }
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           userLat = pos.coords.latitude;
           userLon = pos.coords.longitude;
-          userElevation = pos.coords.altitude || 0;
-          document.getElementById('gps-status').textContent = `GPS: ${userLat.toFixed(2)}°, ${userLon.toFixed(2)}°`;
+          document.getElementById('gps-status').textContent = 
+            `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (GPS Activo)`;
           populateSelect();
         }, () => {
-          document.getElementById('gps-status').textContent = `Ubicación por defecto activa`;
+          document.getElementById('gps-status').textContent = 
+            `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (Ubicación fija)`;
         });
       }
     }
 
-    buildCompassTicks();
     populateSelect();
-    setInterval(updateCalculations, 3000);
+    setInterval(updateCalculations, 4000);
   </script>
 </body>
 </html>
