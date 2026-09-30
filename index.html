@@ -639,6 +639,30 @@
         <button class="cat-btn" id="tab-messier" onclick="selectCategory('messier')">🌌 Messier</button>
       </div>
 
+      <!-- Selector segmentado sin ambigüedad para el filtro de visibilidad -->
+      <div class="visibility-segmented-container" style="margin-bottom: 8px;">
+        <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between;">
+          <span>Filtro de Horizonte:</span>
+          <span id="vis-status-badge" style="color: var(--green); font-weight: 700;">● Filtrando: Solo sobre el horizonte</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; background: #070c15; border: 1px solid var(--card-border); border-radius: 8px; padding: 3px; gap: 4px;">
+          <button 
+            type="button"
+            id="opt-vis-only" 
+            onclick="setVisibilityFilter(true)"
+            style="padding: 7px 6px; font-size: 0.74rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: var(--accent); color: #020c18; transition: all 0.2s;">
+            👁️ Solo Visibles (&gt; 0°)
+          </button>
+          <button 
+            type="button"
+            id="opt-vis-all" 
+            onclick="setVisibilityFilter(false)"
+            style="padding: 7px 6px; font-size: 0.74rem; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); transition: all 0.2s;">
+            🌐 Todo el Catálogo
+          </button>
+        </div>
+      </div>
+
       <div class="filter-bar">
         <input 
           type="text" 
@@ -647,9 +671,6 @@
           placeholder="Buscar: Saturno, Vega, M31..." 
           oninput="handleSearch()"
         />
-        <button class="btn-chip active" id="chip-visible" onclick="toggleOnlyVisible()">
-          Solo Visibles
-        </button>
       </div>
 
       <select id="object-select" onchange="onObjectSelected()"></select>
@@ -1282,11 +1303,28 @@
       populateDropdown();
     }
 
-    function toggleOnlyVisible() {
-      onlyVisible = !onlyVisible;
-      const chip = document.getElementById('chip-visible');
-      chip.classList.toggle('active', onlyVisible);
-      chip.textContent = onlyVisible ? "Solo Visibles" : "Todos los Objetos";
+    function setVisibilityFilter(onlyVis) {
+      onlyVisible = onlyVis;
+      const btnOnly = document.getElementById('opt-vis-only');
+      const btnAll = document.getElementById('opt-vis-all');
+      const badge = document.getElementById('vis-status-badge');
+
+      if (onlyVisible) {
+        btnOnly.style.background = "var(--accent)";
+        btnOnly.style.color = "#020c18";
+        btnAll.style.background = "transparent";
+        btnAll.style.color = "var(--text-muted)";
+        badge.textContent = "● Filtrando: Solo sobre el horizonte";
+        badge.style.color = "var(--green)";
+      } else {
+        btnAll.style.background = "var(--orange)";
+        btnAll.style.color = "#ffffff";
+        btnOnly.style.background = "transparent";
+        btnOnly.style.color = "var(--text-muted)";
+        badge.textContent = "● Mostrando todo (incluso bajo horizonte)";
+        badge.style.color = "var(--orange-bright)";
+      }
+
       populateDropdown();
     }
 
