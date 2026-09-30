@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Localizador astronómico de objetos Messier para trípode con graduación simétrica 0-90-0-90.">
-  <title>Localizador Messier — Trípode 0-90-0-90</title>
+  <meta name="description" content="Localizador astronómico para trípode graduado 0-90-0-90 e inclinómetro: Planetas, Luna, Estrellas Guía y Catálogo Messier.">
+  <title>Localizador Astro 0-90-0-90 — Messier, Planetas y Estrellas</title>
   <style>
     :root {
-      --bg: #06090e;
-      --card-bg: #0f1623;
+      --bg: #050811;
+      --card-bg: #0e1626;
       --card-border: #1e293b;
       --accent: #38bdf8;
       --accent-soft: rgba(56, 189, 248, 0.15);
@@ -25,7 +25,7 @@
     }
 
     body.night-red {
-      --bg: #050000;
+      --bg: #060000;
       --card-bg: #140202;
       --card-border: #3b0a0a;
       --accent: #ef4444;
@@ -56,16 +56,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 10px 48px;
-      transition: background-color 0.25s ease, color 0.25s ease;
+      padding: 10px 10px 40px;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .wrapper {
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     header {
@@ -99,30 +99,30 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      transition: background 0.2s, border-color 0.2s;
+      transition: all 0.2s;
     }
 
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      padding: 12px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
     }
 
-    /* Resumen rápido de lectura para trípode e inclinómetro */
+    /* Indicadores numéricos principales */
     .readout-duo {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .metric-card {
-      background: #090e17;
+      background: #080d17;
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 12px 10px;
+      padding: 10px 8px;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -135,7 +135,7 @@
 
     .metric-card.highlight {
       border-color: var(--orange);
-      box-shadow: 0 0 16px rgba(249, 115, 22, 0.15);
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.18);
     }
 
     .metric-label {
@@ -148,7 +148,7 @@
     }
 
     .metric-val {
-      font-size: 2.15rem;
+      font-size: 2.1rem;
       font-weight: 900;
       line-height: 1.05;
       font-variant-numeric: tabular-nums;
@@ -175,8 +175,8 @@
       border-left: 4px solid var(--orange);
       border-radius: 8px;
       padding: 10px 12px;
-      margin-bottom: 12px;
-      font-size: 0.85rem;
+      margin-bottom: 10px;
+      font-size: 0.84rem;
       line-height: 1.45;
     }
 
@@ -188,16 +188,9 @@
       color: var(--orange-bright);
     }
 
-    .sub-guide {
-      display: block;
-      margin-top: 4px;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-    }
-
     /* Gráfico SVG del trípode */
     .visualizer-container {
-      background: #070c14;
+      background: #060a12;
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 10px 6px;
@@ -218,14 +211,13 @@
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
     }
 
-    /* Controles de cuadrantes y orientación */
     .visual-footer {
       width: 100%;
       display: grid;
       grid-template-columns: auto 1fr;
       align-items: center;
       gap: 12px;
-      padding: 0 8px;
+      padding: 0 6px;
     }
 
     .compass-disc {
@@ -263,11 +255,11 @@
     .sector-text-legend {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
 
     .legend-item {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       display: flex;
       align-items: center;
@@ -275,8 +267,8 @@
     }
 
     .legend-bullet {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 2px;
       background: #1e293b;
       flex-shrink: 0;
@@ -287,7 +279,44 @@
       box-shadow: 0 0 6px var(--orange);
     }
 
-    /* Filtros y formulario de selección */
+    /* Pestañas de categorías */
+    .category-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .cat-btn {
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 7px 4px;
+      border-radius: 7px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    body.night-red .cat-btn {
+      background: #100202;
+    }
+
+    .cat-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #031326;
+    }
+
+    body.night-red .cat-btn.active {
+      background: #dc2626;
+      border-color: #ef4444;
+      color: #ffffff;
+    }
+
+    /* Barra de filtros */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -302,7 +331,7 @@
       border-radius: 8px;
       color: #fff;
       padding: 9px 12px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       outline: none;
     }
 
@@ -319,9 +348,9 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: var(--text-muted);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       cursor: pointer;
       white-space: nowrap;
@@ -345,8 +374,8 @@
       background: #090e17;
       color: #fff;
       border: 1px solid var(--card-border);
-      padding: 11px 10px;
-      font-size: 0.92rem;
+      padding: 10px;
+      font-size: 0.9rem;
       font-weight: 600;
       border-radius: 8px;
       outline: none;
@@ -357,7 +386,7 @@
       color: #fca5a5;
     }
 
-    /* Objeto detalle */
+    /* Metadatos */
     .object-card-meta {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -370,7 +399,7 @@
       background: #090e17;
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 7px 4px;
+      padding: 6px 4px;
     }
 
     body.night-red .meta-box {
@@ -385,13 +414,13 @@
     }
 
     .meta-value {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 800;
       color: var(--text);
       margin-top: 1px;
     }
 
-    /* Panel de ubicación y sincronización */
+    /* Ubicación */
     .loc-bar {
       display: flex;
       justify-content: space-between;
@@ -407,7 +436,7 @@
       color: var(--text);
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 5px 10px;
+      padding: 5px 9px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -417,10 +446,9 @@
       border-color: #450a0a;
     }
 
-    /* Explicación de alineación de trípode */
     details {
       margin-top: 4px;
-      font-size: 0.78rem;
+      font-size: 0.77rem;
       color: var(--text-muted);
       cursor: pointer;
     }
@@ -432,7 +460,7 @@
     }
 
     details p {
-      margin-top: 6px;
+      margin-top: 5px;
       line-height: 1.4;
     }
   </style>
@@ -442,8 +470,8 @@
   <div class="wrapper">
     <header>
       <div class="brand">
-        <h1>Messier 0-90-0-90</h1>
-        <p>Localizador astronómico para trípode de cuadrantes simétricos</p>
+        <h1>Astro 0-90-0-90</h1>
+        <p>Planetas, Luna, Estrellas Guía y Catálogo Messier</p>
       </div>
       <button class="btn-toggle-night" id="btn-night" onclick="toggleNightMode()">
         🌙 Modo Rojo
@@ -453,14 +481,12 @@
     <!-- Tarjeta Principal: Lecturas para Trípode e Inclinómetro -->
     <div class="card">
       <div class="readout-duo">
-        <!-- Azimut en Trípode 0-90-0-90 -->
         <div class="metric-card highlight">
           <div class="metric-label">Dial Trípode (0° - 90°)</div>
           <div class="metric-val orange" id="disp-tripod">--°</div>
           <div class="metric-caption" id="disp-direction-tag">Esperando selección</div>
         </div>
 
-        <!-- Altitud teórica para inclinómetro del telescopio -->
         <div class="metric-card">
           <div class="metric-label">Altitud (Inclinómetro)</div>
           <div class="metric-val cyan" id="disp-altitude">--°</div>
@@ -468,12 +494,11 @@
         </div>
       </div>
 
-      <!-- Indicación inequívoca sin margen de error -->
       <div class="direction-banner" id="banner-direction">
-        <strong>Paso previo:</strong> Alinea la marca <strong>0°</strong> de la base del trípode al <strong>Norte geográfico</strong> exacto y nivela las patas.
+        <strong>Paso previo:</strong> Alinea la marca <strong>0°</strong> del trípode al <strong>Norte geográfico</strong> exacto y nivela la base.
       </div>
 
-      <!-- Representación visual hiperclara del tambor graduado tipo rótula con mando naranja -->
+      <!-- Representación visual SVG del cabezal con mandos naranjas -->
       <div class="visualizer-container">
         <svg class="tripod-svg" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -506,16 +531,15 @@
             </linearGradient>
           </defs>
 
-          <!-- Marco contenedor estético -->
           <rect x="0" y="0" width="420" height="220" rx="10" fill="#060b13" stroke="#1e293b"/>
 
-          <!-- Columna / vástago inferior del trípode -->
+          <!-- Columna / vástago inferior -->
           <rect x="195" y="176" width="30" height="44" fill="#0b0f19" stroke="#1f2937" stroke-width="1.5"/>
           <line x1="202" y1="176" x2="202" y2="220" stroke="#334155" stroke-width="1.5"/>
           <line x1="210" y1="176" x2="210" y2="220" stroke="#1e293b" stroke-width="2"/>
           <line x1="218" y1="176" x2="218" y2="220" stroke="#334155" stroke-width="1.5"/>
 
-          <!-- Anillo estriado inferior de apriete -->
+          <!-- Anillo estriado inferior -->
           <rect x="175" y="160" width="70" height="18" rx="3" fill="#182234" stroke="#334155" stroke-width="1.5"/>
           <line x1="183" y1="160" x2="183" y2="178" stroke="#090e17" stroke-width="2"/>
           <line x1="192" y1="160" x2="192" y2="178" stroke="#090e17" stroke-width="2"/>
@@ -525,16 +549,16 @@
           <line x1="228" y1="160" x2="228" y2="178" stroke="#090e17" stroke-width="2"/>
           <line x1="237" y1="160" x2="237" y2="178" stroke="#090e17" stroke-width="2"/>
 
-          <!-- Bloque del cabezal cilíndrico de la rótula -->
+          <!-- Cabezal cilíndrico -->
           <rect x="145" y="28" width="130" height="92" rx="4" fill="url(#bodyDark)" stroke="#374151" stroke-width="1.5"/>
 
-          <!-- Mando naranja lateral moleteado (bloqueo panorámico derecho) -->
+          <!-- Mando naranja lateral moleteado -->
           <rect x="275" y="34" width="20" height="44" rx="4" fill="url(#sideKnobGrad)" stroke="#7c2d12" stroke-width="1.5"/>
           <line x1="280" y1="36" x2="280" y2="76" stroke="#fed7aa" stroke-width="1.5"/>
           <line x1="285" y1="36" x2="285" y2="76" stroke="#9a3412" stroke-width="1.5"/>
           <line x1="290" y1="36" x2="290" y2="76" stroke="#fed7aa" stroke-width="1.5"/>
 
-          <!-- Mando grande frontal naranja (inspirado en la foto del usuario) -->
+          <!-- Mando grande frontal naranja -->
           <g transform="translate(186, 52)">
             <circle cx="0" cy="0" r="24" fill="url(#knobRadial)" stroke="#c2410c" stroke-width="2"/>
             <circle cx="0" cy="0" r="22" fill="none" stroke="#7c2d12" stroke-dasharray="3.5,3.5" stroke-width="3"/>
@@ -542,26 +566,20 @@
             <circle cx="-3" cy="-4" r="3" fill="#ffedd5" opacity="0.7"/>
           </g>
 
-          <!-- ANILLO GRADUADO METÁLICO (Tambor panorámico 0-90-0-90) -->
+          <!-- Anillo graduado metálico -->
           <rect x="130" y="120" width="160" height="38" rx="4" fill="url(#collarGrad)" stroke="#64748b" stroke-width="1.5"/>
 
-          <!-- Marcas y números dinámicos proyectados en la escala -->
-          <g id="svg-ticks-layer">
-            <!-- Inyectado por JavaScript -->
-          </g>
+          <g id="svg-ticks-layer"></g>
 
-          <!-- Índice de referencia fijo (Línea roja grabada en el cuerpo fijo) -->
+          <!-- Índice de referencia fijo (rojo) -->
           <polygon points="210,118 204,110 216,110" fill="#ef4444" stroke="#7f1d1d" stroke-width="1"/>
           <line x1="210" y1="118" x2="210" y2="152" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="2,2"/>
           <circle cx="210" cy="110" r="2.5" fill="#fecaca"/>
           <text x="210" y="104" font-size="7.5" fill="#ef4444" font-weight="900" text-anchor="middle">ÍNDICE FIJO</text>
 
-          <!-- Flecha de giro dinámico -->
-          <g id="svg-arrow-layer" transform="translate(210, 160)">
-            <!-- Inyectado por JavaScript -->
-          </g>
+          <g id="svg-arrow-layer" transform="translate(210, 160)"></g>
 
-          <!-- Carteles informativos superiores en la esquina del visor -->
+          <!-- Indicadores HUD -->
           <rect x="12" y="14" width="124" height="52" rx="7" fill="#0b1320" stroke="#1e293b"/>
           <text x="20" y="30" font-size="8" fill="#94a3b8" font-weight="800">MARCA TRÍPODE:</text>
           <text x="20" y="55" id="svg-hud-dial" font-size="22" fill="#fb923c" font-weight="900">--°</text>
@@ -571,23 +589,17 @@
           <text x="292" y="55" id="svg-hud-az" font-size="20" fill="#38bdf8" font-weight="900">--°</text>
         </svg>
 
-        <!-- Cuadrante y Rosa de los 4 sectores -->
+        <!-- Cuadrante y Rosa de 4 sectores -->
         <div class="visual-footer">
           <svg class="compass-disc" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="46" fill="#070c14" stroke="#334155" stroke-width="1.5" />
-            
-            <!-- Sector 1: N -> E (0° a 90° Horario) -->
             <path id="quad-1" class="sector-poly" d="M 50 50 L 50 8 A 42 42 0 0 1 92 50 Z" />
-            <!-- Sector 2: E -> S (90° a 180° Horario) -->
             <path id="quad-2" class="sector-poly" d="M 50 50 L 92 50 A 42 42 0 0 1 50 92 Z" />
-            <!-- Sector 3: S -> O (180° a 270° Horario) -->
             <path id="quad-3" class="sector-poly" d="M 50 50 L 50 92 A 42 42 0 0 1 8 50 Z" />
-            <!-- Sector 4: O -> N (270° a 360° Horario) -->
             <path id="quad-4" class="sector-poly" d="M 50 50 L 8 50 A 42 42 0 0 1 50 8 Z" />
 
             <line x1="50" y1="8" x2="50" y2="92" stroke="#334155" stroke-width="1"/>
             <line x1="8" y1="50" x2="92" y2="50" stroke="#334155" stroke-width="1"/>
-
             <circle cx="50" cy="50" r="6" fill="#0b1320" stroke="#475569" stroke-width="1.5"/>
 
             <text x="50" y="16" class="cardinal-label">0° N</text>
@@ -603,29 +615,36 @@
             </div>
             <div class="legend-item" id="leg-2">
               <span class="legend-bullet" id="bullet-2"></span>
-              <span><strong>90° E ➔ 0° S:</strong> Hacia el Sur (Marca = 180°-Az)</span>
+              <span><strong>90° E ➔ 0° S:</strong> Hacia el Sur (180° - Az)</span>
             </div>
             <div class="legend-item" id="leg-3">
               <span class="legend-bullet" id="bullet-3"></span>
-              <span><strong>0° S ➔ 90° O:</strong> Horario desde el Sur (Az-180°)</span>
+              <span><strong>0° S ➔ 90° O:</strong> Horario desde Sur (Az - 180°)</span>
             </div>
             <div class="legend-item" id="leg-4">
               <span class="legend-bullet" id="bullet-4"></span>
-              <span><strong>90° O ➔ 0° N:</strong> Antihorario desde el Norte (360°-Az)</span>
+              <span><strong>90° O ➔ 0° N:</strong> Antihorario desde Norte (360° - Az)</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Selección y Búsqueda de Objetos Messier -->
+    <!-- Selección, Categorías y Búsqueda -->
     <div class="card">
+      <div class="category-tabs">
+        <button class="cat-btn active" id="tab-all" onclick="selectCategory('all')">Todos</button>
+        <button class="cat-btn" id="tab-solar" onclick="selectCategory('solar')">🪐 Planetas/Luna</button>
+        <button class="cat-btn" id="tab-stars" onclick="selectCategory('stars')">⭐ Estrellas</button>
+        <button class="cat-btn" id="tab-messier" onclick="selectCategory('messier')">🌌 Messier</button>
+      </div>
+
       <div class="filter-bar">
         <input 
           type="text" 
           id="search-input" 
           class="search-input" 
-          placeholder="Buscar: M31, Orión, Galaxia..." 
+          placeholder="Buscar: Saturno, Vega, M31..." 
           oninput="handleSearch()"
         />
         <button class="btn-chip active" id="chip-visible" onclick="toggleOnlyVisible()">
@@ -635,10 +654,9 @@
 
       <select id="object-select" onchange="onObjectSelected()"></select>
 
-      <!-- Ficha rápida del objeto seleccionado -->
       <div class="object-card-meta">
         <div class="meta-box">
-          <div class="meta-title">Tipo</div>
+          <div class="meta-title">Tipo / Clase</div>
           <div class="meta-value" id="meta-type">--</div>
         </div>
         <div class="meta-box">
@@ -652,30 +670,50 @@
       </div>
     </div>
 
-    <!-- Barra de Ubicación / GPS -->
+    <!-- Ubicación y Documentación -->
     <div class="card">
       <div class="loc-bar">
-        <span id="loc-text">Coord: 37.18° N, -5.78° O (Hora local)</span>
+        <span id="loc-text">Coord: 37.18° N, -5.78° O (Utrera)</span>
         <button class="btn-mini" onclick="requestGPS()">📡 Usar mi GPS</button>
       </div>
 
       <details>
-        <summary>¿Cómo interpretar la escala 0-90-0-90 de mi trípode?</summary>
+        <summary>¿Cómo usar las Estrellas Guía y Planetas para calibrar?</summary>
         <p>
-          Tu trípode tiene un limbo continuo de 360° dividido en cuatro cuadrantes de 90°.
-          Al alinear la marca <strong>0° del trípode al Norte geográfico</strong>:
+          1. <strong>Polaris (Estrella Polar):</strong> Marca exactamente 0° en el trípode y la altitud equivalente a tu latitud (~37.2° en Utrera). Úsala para poner el 0° de tu trípode al Norte perfecto.
         </p>
-        <p>• La marca <strong>90° derecha</strong> coincide con el <strong>Este</strong>.</p>
-        <p>• La segunda marca <strong>0°</strong> coincide con el <strong>Sur</strong>.</p>
-        <p>• La marca <strong>90° izquierda</strong> coincide con el <strong>Oeste</strong>.</p>
         <p>
-          Esta aplicación calcula automáticamente en qué cuadrante cae el astro y qué marca física exacta debes alinear con el índice rojo.
+          2. <strong>Estrellas brillantes y Planetas:</strong> Objetos como Venus, Júpiter, Saturno o Vega son visibles inmediatamente a simple vista incluso al anochecer. Selecciónalos primero para comprobar la alineación exacta de tu montura y tu inclinómetro.
         </p>
       </details>
     </div>
   </div>
 
   <script>
+    // Base de Estrellas Principales para Calibración y Navegación
+    const GUIDE_STARS = [
+      { id: "STAR-POLARIS", name: "Polaris (Estrella Polar)", con: "UMi", type: "Estrella Guía (Norte)", mag: 1.98, ra: 2.530, dec: 89.26 },
+      { id: "STAR-VEGA", name: "Vega", con: "Lyr", type: "Estrella Guía", mag: 0.03, ra: 18.615, dec: 38.78 },
+      { id: "STAR-SIRIUS", name: "Sirio", con: "CMa", type: "Estrella Guía", mag: -1.46, ra: 6.752, dec: -16.72 },
+      { id: "STAR-ARCTURUS", name: "Arturo", con: "Boo", type: "Estrella Guía", mag: -0.05, ra: 14.261, dec: 19.18 },
+      { id: "STAR-BETELGEUSE", name: "Betelgeuse", con: "Ori", type: "Supergigante Roja", mag: 0.50, ra: 5.919, dec: 7.41 },
+      { id: "STAR-RIGEL", name: "Rigel", con: "Ori", type: "Supergigante Azul", mag: 0.13, ra: 5.242, dec: -8.20 },
+      { id: "STAR-ALTAIR", name: "Altair", con: "Aql", type: "Estrella Guía", mag: 0.77, ra: 19.846, dec: 8.87 },
+      { id: "STAR-DENEB", name: "Deneb", con: "Cyg", type: "Supergigante Blanca", mag: 1.25, ra: 20.696, dec: 45.28 },
+      { id: "STAR-CAPELLA", name: "Capella", con: "Aur", type: "Estrella Guía", mag: 0.08, ra: 5.278, dec: 46.00 },
+      { id: "STAR-ALDEBARAN", name: "Aldebarán", con: "Tau", type: "Gigante Naranja", mag: 0.85, ra: 4.598, dec: 16.51 },
+      { id: "STAR-SPICA", name: "Espiga (Spica)", con: "Vir", type: "Estrella Guía", mag: 0.98, ra: 13.419, dec: -11.16 },
+      { id: "STAR-ANTARES", name: "Antares", con: "Sco", type: "Supergigante Roja", mag: 1.06, ra: 16.490, dec: -26.43 },
+      { id: "STAR-PROCYON", name: "Procyon", con: "CMi", type: "Estrella Guía", mag: 0.38, ra: 7.655, dec: 5.22 },
+      { id: "STAR-POLLUX", name: "Pólux", con: "Gem", type: "Gigante Naranja", mag: 1.14, ra: 7.755, dec: 28.03 },
+      { id: "STAR-CASTOR", name: "Cástor", con: "Gem", type: "Estrella Múltiple", mag: 1.58, ra: 7.576, dec: 31.89 },
+      { id: "STAR-REGULUS", name: "Régulo", con: "Leo", type: "Estrella Guía", mag: 1.36, ra: 10.139, dec: 11.97 },
+      { id: "STAR-FOMALHAUT", name: "Fomalhaut", con: "PsA", type: "Estrella Guía", mag: 1.16, ra: 22.960, dec: -29.62 },
+      { id: "STAR-DUBHE", name: "Dubhe", con: "UMa", type: "Puntero Osa Mayor", mag: 1.79, ra: 11.062, dec: 61.75 },
+      { id: "STAR-MERAK", name: "Merak", con: "UMa", type: "Puntero Osa Mayor", mag: 2.37, ra: 11.030, dec: 56.38 }
+    ];
+
+    // Catálogo Messier Completo M1 - M110
     const MESSIER_DATA = [
       { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", type: "Remanente Supernova", mag: 8.4, ra: 5.575, dec: 22.01 },
       { id: "M2", name: "Cúmulo globular", con: "Aqr", type: "Cúmulo Globular", mag: 6.5, ra: 21.558, dec: -0.82 },
@@ -793,9 +831,172 @@
     let userLat = 37.18;
     let userLon = -5.78;
     let onlyVisible = true;
+    let currentCategory = 'all'; // 'all', 'solar', 'stars', 'messier'
     let searchQuery = "";
 
-    // Cálculo del Tiempo Sidéreo Local (LST) en horas decimales
+    // Algoritmos de efemérides en tiempo real para Luna y Planetas
+    const D2R = Math.PI / 180;
+    const R2D = 180 / Math.PI;
+
+    function normalizeDeg(deg) {
+      return ((deg % 360) + 360) % 360;
+    }
+
+    function getJulianDate(date) {
+      return (date.getTime() / 86400000) + 2440587.5;
+    }
+
+    function getSunCoords(d) {
+      const w = 282.9404 + 4.70935E-5 * d;
+      const a = 1.000000;
+      const e = 0.016709 - 1.151E-9 * d;
+      const M = normalizeDeg(356.0470 + 0.9856002585 * d);
+      const E = M + (R2D * e * Math.sin(M * D2R) * (1 + e * Math.cos(M * D2R)));
+      const xv = Math.cos(E * D2R) - e;
+      const yv = Math.sin(E * D2R) * Math.sqrt(1 - e * e);
+      const r = Math.sqrt(xv * xv + yv * yv);
+      const v = normalizeDeg(Math.atan2(yv, xv) * R2D);
+      const lonsun = normalizeDeg(v + w);
+      return {
+        x: r * Math.cos(lonsun * D2R),
+        y: r * Math.sin(lonsun * D2R),
+        z: 0.0,
+        lon: lonsun
+      };
+    }
+
+    function solveKepler(M, e) {
+      let E = M + (R2D * e * Math.sin(M * D2R) * (1 + e * Math.cos(M * D2R)));
+      for (let i = 0; i < 4; i++) {
+        const dE = (E - (R2D * e * Math.sin(E * D2R)) - M) / (1 - e * Math.cos(E * D2R));
+        E -= dE;
+      }
+      return E;
+    }
+
+    // Calcula coordenadas RA/Dec de los cuerpos del Sistema Solar para la fecha actual
+    function getSolarSystemObjects(date) {
+      const jd = getJulianDate(date);
+      const d = jd - 2451543.5;
+      const sun = getSunCoords(d);
+      const ecl = 23.4393 - 3.563E-7 * d;
+      const cosEcl = Math.cos(ecl * D2R);
+      const sinEcl = Math.sin(ecl * D2R);
+
+      // Parámetros orbitales keplerianos estándar
+      const planetsData = [
+        {
+          id: "SOL-MERCURY", name: "Mercurio", type: "Planeta Interior", con: "Eclíptica", mag: 0.1,
+          N: 48.3313 + 3.24587E-5 * d, i: 7.0047 + 5.00E-8 * d, w: 29.1241 + 1.01444E-5 * d,
+          a: 0.387098, e: 0.205635 + 5.59E-10 * d, M: 168.6562 + 4.0923344368 * d
+        },
+        {
+          id: "SOL-VENUS", name: "Venus (Lucero)", type: "Planeta Interior", con: "Eclíptica", mag: -4.3,
+          N: 76.6799 + 2.46590E-5 * d, i: 3.3946 + 2.75E-8 * d, w: 54.8910 + 1.38374E-5 * d,
+          a: 0.723330, e: 0.006773 - 1.302E-9 * d, M: 48.0052 + 1.6021302244 * d
+        },
+        {
+          id: "SOL-MARS", name: "Marte (Planeta Rojo)", type: "Planeta Rocoso", con: "Eclíptica", mag: 0.5,
+          N: 49.5574 + 2.11081E-5 * d, i: 1.8497 - 1.78E-8 * d, w: 286.5016 + 2.92961E-5 * d,
+          a: 1.523688, e: 0.093405 + 2.516E-9 * d, M: 18.6021 + 0.5240207766 * d
+        },
+        {
+          id: "SOL-JUPITER", name: "Júpiter", type: "Gigante Gaseoso", con: "Eclíptica", mag: -2.4,
+          N: 100.4542 + 2.76854E-5 * d, i: 1.3030 - 1.557E-7 * d, w: 273.8777 + 1.64505E-5 * d,
+          a: 5.20256, e: 0.048498 + 4.469E-9 * d, M: 19.8950 + 0.0830853001 * d
+        },
+        {
+          id: "SOL-SATURN", name: "Saturno (Anillos)", type: "Gigante Gaseoso", con: "Eclíptica", mag: 0.6,
+          N: 113.6634 + 2.38980E-5 * d, i: 2.4886 - 1.081E-7 * d, w: 339.3939 + 2.97661E-5 * d,
+          a: 9.55475, e: 0.055546 - 9.499E-9 * d, M: 316.9670 + 0.0334442282 * d
+        }
+      ];
+
+      const results = planetsData.map(p => {
+        const N = normalizeDeg(p.N);
+        const i = p.i;
+        const w = normalizeDeg(p.w);
+        const M = normalizeDeg(p.M);
+        const e = p.e;
+        const a = p.a;
+
+        const E = solveKepler(M, e);
+        const xv = a * (Math.cos(E * D2R) - e);
+        const yv = a * (Math.sqrt(1 - e * e) * Math.sin(E * D2R));
+
+        const v = normalizeDeg(Math.atan2(yv, xv) * R2D);
+        const r = Math.sqrt(xv * xv + yv * yv);
+
+        // Coordenadas heliocéntricas
+        const xh = r * (Math.cos(N * D2R) * Math.cos((v + w) * D2R) - Math.sin(N * D2R) * Math.sin((v + w) * D2R) * Math.cos(i * D2R));
+        const yh = r * (Math.sin(N * D2R) * Math.cos((v + w) * D2R) + Math.cos(N * D2R) * Math.sin((v + w) * D2R) * Math.cos(i * D2R));
+        const zh = r * (Math.sin((v + w) * D2R) * Math.sin(i * D2R));
+
+        // Coordenadas geocéntricas (restando la Tierra respecto al Sol)
+        const xg = xh + sun.x;
+        const yg = yh + sun.y;
+        const zg = zh + sun.z;
+
+        // Ecuatoriales
+        const xe = xg;
+        const ye = yg * cosEcl - zg * sinEcl;
+        const ze = yg * sinEcl + zg * cosEcl;
+
+        let ra = normalizeDeg(Math.atan2(ye, xe) * R2D) / 15.0; // En horas
+        const dist = Math.sqrt(xe * xe + ye * ye + ze * ze);
+        const dec = Math.asin(ze / dist) * R2D;
+
+        return {
+          id: p.id,
+          name: p.name,
+          type: p.type,
+          con: p.con,
+          mag: p.mag,
+          ra: ra,
+          dec: dec
+        };
+      });
+
+      // Cálculo simplificado de la Luna
+      const N_m = normalizeDeg(125.1228 - 0.0529538083 * d);
+      const i_m = 5.1454;
+      const w_m = normalizeDeg(318.0634 + 0.1643573223 * d);
+      const a_m = 60.2666; // En radios terrestres
+      const e_m = 0.054900;
+      const M_m = normalizeDeg(115.3654 + 13.0649929509 * d);
+
+      const E_m = solveKepler(M_m, e_m);
+      const xv_m = a_m * (Math.cos(E_m * D2R) - e_m);
+      const yv_m = a_m * (Math.sqrt(1 - e_m * e_m) * Math.sin(E_m * D2R));
+
+      const v_m = normalizeDeg(Math.atan2(yv_m, xv_m) * R2D);
+      const r_m = Math.sqrt(xv_m * xv_m + yv_m * yv_m);
+
+      const xh_m = r_m * (Math.cos(N_m * D2R) * Math.cos((v_m + w_m) * D2R) - Math.sin(N_m * D2R) * Math.sin((v_m + w_m) * D2R) * Math.cos(i_m * D2R));
+      const yh_m = r_m * (Math.sin(N_m * D2R) * Math.cos((v_m + w_m) * D2R) + Math.cos(N_m * D2R) * Math.sin((v_m + w_m) * D2R) * Math.cos(i_m * D2R));
+      const zh_m = r_m * (Math.sin((v_m + w_m) * D2R) * Math.sin(i_m * D2R));
+
+      const xe_m = xh_m;
+      const ye_m = yh_m * cosEcl - zh_m * sinEcl;
+      const ze_m = yh_m * sinEcl + zh_m * cosEcl;
+
+      let ra_m = normalizeDeg(Math.atan2(ye_m, xe_m) * R2D) / 15.0;
+      const dist_m = Math.sqrt(xe_m * xe_m + ye_m * ye_m + ze_m * ze_m);
+      const dec_m = Math.asin(ze_m / dist_m) * R2D;
+
+      results.unshift({
+        id: "SOL-MOON",
+        name: "Luna",
+        type: "Satélite Natural",
+        con: "Variable",
+        mag: -11.0,
+        ra: ra_m,
+        dec: dec_m
+      });
+
+      return results;
+    }
+
     function getLST(date, lon) {
       const jd = (date.getTime() / 86400000) + 2440587.5;
       const d = jd - 2451545.0;
@@ -805,35 +1006,31 @@
       return ((lst % 24) + 24) % 24;
     }
 
-    // Conversión RA/Dec a Azimut (360°) y Altitud (grados decimales)
     function raDecToAltAz(ra, dec, lat, lst) {
-      const d2r = Math.PI / 180;
-      const r2d = 180 / Math.PI;
-
       let ha = (lst - ra) * 15.0;
       ha = ((ha % 360) + 360) % 360;
 
-      const phi = lat * d2r;
-      const delta = dec * d2r;
-      const H = ha * d2r;
+      const phi = lat * D2R;
+      const delta = dec * D2R;
+      const H = ha * D2R;
 
       const sinAlt = Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H);
       const alt = Math.asin(sinAlt);
 
       const cosAz = (Math.sin(delta) - Math.sin(phi) * Math.sin(alt)) / (Math.cos(phi) * Math.cos(alt));
-      let az = Math.acos(Math.max(-1, Math.min(1, cosAz))) * r2d;
+      let az = Math.acos(Math.max(-1, Math.min(1, cosAz))) * R2D;
       if (Math.sin(H) > 0) az = 360 - az;
 
-      return { az: az, alt: alt * r2d };
+      return { az: az, alt: alt * R2D };
     }
 
     /*
-      Mapeo al tambor simétrico 0-90-0-90:
-      Con 0° alineado al Norte geográfico y 0° opuesto al Sur:
+      Mapeo al trípode simétrico 0-90-0-90:
+      Con 0° alineado al Norte geográfico y el otro 0° al Sur geográfico:
       
       - Cuadrante 1 (Az 0° a 90° - Norte a Este):
         Marca del tambor = Az
-        Acción: Giro a la DERECHA (Horario ↻) desde la marca 0° del Norte hacia 90° Este.
+        Acción: Giro a la DERECHA (Horario ↻) desde la marca 0° del Norte hasta el valor.
 
       - Cuadrante 2 (Az 90° a 180° - Este a Sur):
         El tambor va de 90° (Este) descendiendo a 0° (Sur).
@@ -855,7 +1052,7 @@
       let quad = 1;
       let directionTag = "";
       let detailedBanner = "";
-      let arrowDirection = "right"; // 'right' o 'left'
+      let arrowDirection = "right";
 
       if (az >= 0 && az < 90) {
         quad = 1;
@@ -905,7 +1102,6 @@
       const startDeg = Math.floor(dialVal - 20);
       const endDeg = Math.ceil(dialVal + 20);
 
-      // Dibujar graduación en el tambor cilíndrico
       for (let deg = startDeg; deg <= endDeg; deg++) {
         let displayDeg = deg;
         if (displayDeg < 0) displayDeg = Math.abs(displayDeg);
@@ -941,7 +1137,6 @@
         }
       }
 
-      // Dibujar flecha indicadora del sentido de giro
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       if (arrowDir === "right") {
         path.setAttribute("d", "M -32,5 Q 0,16 32,5 L 26,0 M 32,5 L 26,10");
@@ -959,13 +1154,30 @@
       for (let q = 1; q <= 4; q++) {
         const poly = document.getElementById(`quad-${q}`);
         const bullet = document.getElementById(`bullet-${q}`);
-        if (poly) {
-          poly.classList.toggle('active', q === activeQuad);
-        }
-        if (bullet) {
-          bullet.classList.toggle('active', q === activeQuad);
-        }
+        if (poly) poly.classList.toggle('active', q === activeQuad);
+        if (bullet) bullet.classList.toggle('active', q === activeQuad);
       }
+    }
+
+    function getAllCurrentObjects() {
+      const now = new Date();
+      const solarObjects = getSolarSystemObjects(now);
+
+      if (currentCategory === 'solar') return solarObjects;
+      if (currentCategory === 'stars') return GUIDE_STARS;
+      if (currentCategory === 'messier') return MESSIER_DATA;
+
+      // 'all': Combina Planetas primero (muy brillantes), luego Estrellas, luego Messier
+      return [...solarObjects, ...GUIDE_STARS, ...MESSIER_DATA];
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      ['all', 'solar', 'stars', 'messier'].forEach(c => {
+        const btn = document.getElementById(`tab-${c}`);
+        if (btn) btn.classList.toggle('active', c === cat);
+      });
+      populateDropdown();
     }
 
     function populateDropdown() {
@@ -975,8 +1187,9 @@
 
       const now = new Date();
       const lst = getLST(now, userLon);
+      const pool = getAllCurrentObjects();
 
-      const filtered = MESSIER_DATA.filter(obj => {
+      const filtered = pool.filter(obj => {
         const matchesQuery = 
           obj.id.toLowerCase().includes(searchQuery) ||
           obj.name.toLowerCase().includes(searchQuery) ||
@@ -1002,7 +1215,7 @@
 
       if (filtered.length === 0) {
         const emptyOpt = document.createElement('option');
-        emptyOpt.textContent = "No se encontraron objetos visibles";
+        emptyOpt.textContent = "No se encontraron objetos visibles en este grupo";
         select.appendChild(emptyOpt);
         return;
       }
@@ -1012,7 +1225,8 @@
         const opt = document.createElement('option');
         opt.value = obj.id;
         const altSign = alt >= 0 ? `+${alt.toFixed(0)}°` : `${alt.toFixed(0)}°`;
-        opt.textContent = `${obj.id} — ${obj.name} [${altSign} Alt, ${obj.con}]`;
+        const prefix = obj.id.startsWith("SOL") ? "🪐 " : (obj.id.startsWith("STAR") ? "⭐ " : "");
+        opt.textContent = `${prefix}${obj.id.replace("STAR-", "").replace("SOL-", "")} — ${obj.name} [${altSign} Alt, ${obj.con}]`;
         select.appendChild(opt);
       });
 
@@ -1026,7 +1240,8 @@
     function refreshTargetReadouts() {
       const select = document.getElementById('object-select');
       const targetId = select.value;
-      const obj = MESSIER_DATA.find(o => o.id === targetId);
+      const pool = getAllCurrentObjects();
+      const obj = pool.find(o => o.id === targetId);
 
       if (!obj) {
         document.getElementById('disp-tripod').textContent = "--°";
@@ -1034,20 +1249,15 @@
         return;
       }
 
-      // Actualizar tarjeta meta del objeto
       document.getElementById('meta-type').textContent = obj.type;
       document.getElementById('meta-con').textContent = obj.con;
-      document.getElementById('meta-mag').textContent = `${obj.mag} mag`;
+      document.getElementById('meta-mag').textContent = `${obj.mag > 0 ? '+' : ''}${obj.mag} mag`;
 
-      // Calcular Az y Alt en tiempo real
       const now = new Date();
       const lst = getLST(now, userLon);
       const { az, alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
-
-      // Resolver graduación del trípode
       const trip = resolveTripodGraduation(az);
 
-      // Actualizar lecturas prominentes
       document.getElementById('disp-tripod').textContent = `${trip.dial.toFixed(1)}°`;
       document.getElementById('disp-direction-tag').textContent = trip.directionTag;
 
@@ -1055,14 +1265,10 @@
       document.getElementById('disp-altitude').textContent = `${altPrefix}${alt.toFixed(1)}°`;
       document.getElementById('disp-altitude-tag').textContent = alt >= 0 ? "Ajustar Inclinómetro" : "Bajo el Horizonte";
 
-      // Instrucciones directas
       document.getElementById('banner-direction').innerHTML = trip.detailedBanner;
-
-      // HUD del SVG
       document.getElementById('svg-hud-dial').textContent = `${trip.dial.toFixed(1)}°`;
       document.getElementById('svg-hud-az').textContent = `${az.toFixed(1)}°`;
 
-      // Gráficos interactivos
       renderSvgDial(trip.dial, trip.arrowDirection);
       updateCompassWidget(trip.quad);
     }
@@ -1080,13 +1286,13 @@
       onlyVisible = !onlyVisible;
       const chip = document.getElementById('chip-visible');
       chip.classList.toggle('active', onlyVisible);
-      chip.textContent = onlyVisible ? "Solo Visibles" : "Todos los 110";
+      chip.textContent = onlyVisible ? "Solo Visibles" : "Todos los Objetos";
       populateDropdown();
     }
 
     function toggleNightMode() {
       const isNight = document.body.classList.toggle('night-red');
-      localStorage.setItem('messier_night_mode', isNight ? '1' : '0');
+      localStorage.setItem('astro_night_mode', isNight ? '1' : '0');
       const btn = document.getElementById('btn-night');
       btn.textContent = isNight ? "☀️ Modo Normal" : "🌙 Modo Rojo";
     }
@@ -1094,7 +1300,7 @@
     function requestGPS() {
       const locText = document.getElementById('loc-text');
       if (!navigator.geolocation) {
-        locText.textContent = "Geolocalización no soportada por el navegador.";
+        locText.textContent = "Geolocalización no soportada.";
         return;
       }
 
@@ -1106,29 +1312,27 @@
           locText.textContent = `GPS fijado: ${userLat.toFixed(2)}° Lat, ${userLon.toFixed(2)}° Lon`;
           populateDropdown();
         },
-        (err) => {
+        () => {
           locText.textContent = `Ubicación manual: ${userLat.toFixed(2)}° Lat, ${userLon.toFixed(2)}° Lon`;
         },
         { enableHighAccuracy: true, timeout: 8000 }
       );
     }
 
+    // Inicialización al cargar la página
     window.addEventListener('DOMContentLoaded', () => {
-      // Cargar preferencia de modo noche
-      if (localStorage.getItem('messier_night_mode') === '1') {
+      if (localStorage.getItem('astro_night_mode') === '1') {
         document.body.classList.add('night-red');
         document.getElementById('btn-night').textContent = "☀️ Modo Normal";
       }
 
-      // Cargar lista inicial
       populateDropdown();
 
-      // Autoiniciar detección GPS si está disponible
       if (navigator.geolocation) {
         requestGPS();
       }
 
-      // Actualizar automáticamente cada 3 segundos el cálculo astronómico
+      // Actualización astronómica continua cada 3 segundos
       setInterval(refreshTargetReadouts, 3000);
     });
   </script>
