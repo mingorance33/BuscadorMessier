@@ -3,18 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Localizador Messier (M1 - M110) - Trípode 90°</title>
+  <meta name="description" content="Localizador astronómico de objetos Messier para trípode con graduación simétrica 0-90-0-90.">
+  <title>Localizador Messier — Trípode 0-90-0-90</title>
   <style>
     :root {
-      --bg: #070b12;
-      --card-bg: #0f1724;
-      --border: #1e293b;
+      --bg: #06090e;
+      --card-bg: #0f1623;
+      --card-border: #1e293b;
       --accent: #38bdf8;
-      --text: #f1f5f9;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --orange: #f97316;
+      --orange-bright: #fb923c;
+      --orange-dark: #c2410c;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
       --green: #22c55e;
-      --orange: #f97316;
-      --yellow: #facc15;
+      --red-indicator: #ef4444;
+      --metal-1: #334155;
+      --metal-2: #1e293b;
+      --metal-3: #0f172a;
+    }
+
+    body.night-red {
+      --bg: #050000;
+      --card-bg: #140202;
+      --card-border: #3b0a0a;
+      --accent: #ef4444;
+      --accent-soft: rgba(239, 68, 68, 0.2);
+      --orange: #dc2626;
+      --orange-bright: #ef4444;
+      --orange-dark: #7f1d1d;
+      --text: #fca5a5;
+      --text-muted: #991b1b;
+      --green: #ef4444;
+      --red-indicator: #ff2a2a;
+      --metal-1: #2a0505;
+      --metal-2: #1a0303;
+      --metal-3: #0c0101;
     }
 
     * {
@@ -26,429 +51,753 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 14px;
-      min-height: 100vh;
+      padding: 12px 10px 48px;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    .container {
+    .wrapper {
       width: 100%;
-      max-width: 440px;
+      max-width: 500px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    h1 {
-      color: var(--accent);
-      font-size: 1.35rem;
-      text-align: center;
-      margin-bottom: 2px;
-    }
-
-    .subtitle {
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .panel {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .btn-action {
-      width: 100%;
-      background: var(--accent);
-      color: #031326;
-      border: none;
-      padding: 12px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .btn-action:active {
-      transform: scale(0.98);
-    }
-
-    .status-gps {
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-    }
-
-    .filter-row {
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      padding: 4px 6px;
     }
 
-    .label-title {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--orange-bright);
+      letter-spacing: -0.01em;
     }
 
-    .btn-chip {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-chip.active {
-      background: #0284c7;
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    select {
-      width: 100%;
-      background: #090d16;
-      color: #fff;
-      border: 1px solid #334155;
-      padding: 10px;
-      font-size: 0.92rem;
-      border-radius: 8px;
-      outline: none;
-    }
-
-    .section-title {
-      text-align: center;
+    .brand p {
       font-size: 0.72rem;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 10px;
     }
 
-    /* Caja del Trípode con el Gráfico a la Derecha */
-    .tripod-box {
-      background: #090d16;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      display: flex;
+    .btn-toggle-night {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      gap: 5px;
+      transition: background 0.2s, border-color 0.2s;
     }
 
-    .tripod-info {
-      flex: 1;
-      text-align: left;
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
     }
 
-    .tripod-val {
-      font-size: 2.3rem;
-      font-weight: 900;
-      color: var(--orange);
-      line-height: 1.05;
-      margin: 2px 0;
-    }
-
-    .tripod-sector {
-      font-size: 0.88rem;
-      color: var(--green);
-      font-weight: 600;
-    }
-
-    /* Gráfico circular de sectores */
-    .quadrant-widget {
-      width: 80px;
-      height: 80px;
-      flex-shrink: 0;
-    }
-
-    .q-sector {
-      fill: #1e293b;
-      stroke: #090d16;
-      stroke-width: 2;
-      transition: fill 0.25s, filter 0.25s;
-    }
-
-    .q-sector.active {
-      fill: var(--orange);
-      filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7));
-    }
-
-    .q-cardinal {
-      font-size: 8px;
-      fill: #94a3b8;
-      font-weight: 800;
-      text-anchor: middle;
-      dominant-baseline: central;
-    }
-
-    .coords-grid {
+    /* Resumen rápido de lectura para trípode e inclinómetro */
+    .readout-duo {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-bottom: 12px;
     }
 
-    .coord-box {
-      background: #070b12;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 10px;
+    .metric-card {
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 10px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    .coord-label {
-      font-size: 0.68rem;
-      color: var(--text-muted);
+    body.night-red .metric-card {
+      background: #0d0101;
+    }
+
+    .metric-card.highlight {
+      border-color: var(--orange);
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.15);
+    }
+
+    .metric-label {
+      font-size: 0.65rem;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
     }
 
-    .coord-val {
-      font-size: 1.45rem;
-      font-weight: 800;
+    .metric-val {
+      font-size: 2.15rem;
+      font-weight: 900;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-val.orange {
+      color: var(--orange-bright);
+    }
+
+    .metric-val.cyan {
       color: var(--accent);
     }
 
-    .sensor-reading {
-      text-align: center;
-      font-size: 0.85rem;
+    .metric-caption {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 3px;
       color: var(--text-muted);
+    }
+
+    /* Caja de instrucciones de giro sin ambigüedad */
+    .direction-banner {
+      background: #0c1424;
+      border-left: 4px solid var(--orange);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+
+    body.night-red .direction-banner {
+      background: #190303;
+    }
+
+    .direction-banner strong {
+      color: var(--orange-bright);
+    }
+
+    .sub-guide {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Gráfico SVG del trípode */
+    .visualizer-container {
+      background: #070c14;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.night-red .visualizer-container {
+      background: #0a0101;
+    }
+
+    .tripod-svg {
+      width: 100%;
+      max-width: 440px;
+      height: auto;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+    }
+
+    /* Controles de cuadrantes y orientación */
+    .visual-footer {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px;
+    }
+
+    .compass-disc {
+      width: 86px;
+      height: 86px;
+      flex-shrink: 0;
+    }
+
+    .sector-poly {
+      fill: #1e293b;
+      stroke: #090e17;
+      stroke-width: 1.5;
+      transition: fill 0.2s, opacity 0.2s;
+      opacity: 0.55;
+    }
+
+    .sector-poly.active {
+      fill: var(--orange);
+      opacity: 1;
+      filter: drop-shadow(0 0 6px var(--orange-dark));
+    }
+
+    .cardinal-label {
+      font-size: 8.5px;
+      font-weight: 900;
+      fill: #94a3b8;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    body.night-red .cardinal-label {
+      fill: #991b1b;
+    }
+
+    .sector-text-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .legend-item {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-bullet {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      background: #1e293b;
+      flex-shrink: 0;
+    }
+
+    .legend-bullet.active {
+      background: var(--orange);
+      box-shadow: 0 0 6px var(--orange);
+    }
+
+    /* Filtros y formulario de selección */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
       margin-bottom: 8px;
     }
 
-    .target-banner {
-      background: #111827;
-      border: 1px solid #1f2937;
-      color: var(--yellow);
-      text-align: center;
-      padding: 12px;
+    .search-input {
+      flex: 1;
+      background: #090e17;
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      font-size: 1.15rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      transition: background 0.2s, color 0.2s;
+      color: #fff;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      outline: none;
     }
 
-    .target-banner.aligned {
-      background: #14532d;
-      border-color: #22c55e;
-      color: #86efac;
+    body.night-red .search-input {
+      background: #140202;
+      color: #fca5a5;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-chip.active {
+      background: #0284c7;
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    body.night-red .btn-chip.active {
+      background: #991b1b;
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    select {
+      width: 100%;
+      background: #090e17;
+      color: #fff;
+      border: 1px solid var(--card-border);
+      padding: 11px 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    body.night-red select {
+      background: #140202;
+      color: #fca5a5;
+    }
+
+    /* Objeto detalle */
+    .object-card-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .meta-box {
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 7px 4px;
+    }
+
+    body.night-red .meta-box {
+      background: #100202;
+    }
+
+    .meta-title {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 1px;
+    }
+
+    /* Panel de ubicación y sincronización */
+    .loc-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .btn-mini {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    body.night-red .btn-mini {
+      background: #250303;
+      border-color: #450a0a;
+    }
+
+    /* Explicación de alineación de trípode */
+    details {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    details summary {
+      font-weight: 700;
+      color: var(--accent);
+      padding: 4px 0;
+    }
+
+    details p {
+      margin-top: 6px;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Localizador Messier (M1 - M110)</h1>
-    <div class="subtitle">Alineación: Marca 0° del trípode al Norte exacto</div>
-
-    <div class="panel">
-      <button class="btn-action" id="btn-activate" onclick="startApp()">Activar Sensor y Audio</button>
-      <div class="status-gps" id="gps-status">Lat: 37.18° N, Lon: -5.78° O (Esperando activación...)</div>
-    </div>
-
-    <div class="panel">
-      <div class="filter-row">
-        <span class="label-title">Selecciona Objeto:</span>
-        <button class="btn-chip active" id="filter-btn" onclick="toggleOnlyVisible()">Solo Visibles</button>
+  <div class="wrapper">
+    <header>
+      <div class="brand">
+        <h1>Messier 0-90-0-90</h1>
+        <p>Localizador astronómico para trípode de cuadrantes simétricos</p>
       </div>
-      <select id="object-select" onchange="updateCalculations()"></select>
-    </div>
+      <button class="btn-toggle-night" id="btn-night" onclick="toggleNightMode()">
+        🌙 Modo Rojo
+      </button>
+    </header>
 
-    <div class="panel">
-      <div class="section-title">Coordenadas en Vivo del Objeto</div>
-
-      <!-- Marca para Trípode + Gráfico Circular de 4 Cuadrantes -->
-      <div class="tripod-box">
-        <div class="tripod-info">
-          <div class="coord-label">Marca en el Trípode (0° - 90°)</div>
-          <div class="tripod-val" id="disp-tripod">--°</div>
-          <div class="tripod-sector" id="disp-sector">Esperando selección</div>
+    <!-- Tarjeta Principal: Lecturas para Trípode e Inclinómetro -->
+    <div class="card">
+      <div class="readout-duo">
+        <!-- Azimut en Trípode 0-90-0-90 -->
+        <div class="metric-card highlight">
+          <div class="metric-label">Dial Trípode (0° - 90°)</div>
+          <div class="metric-val orange" id="disp-tripod">--°</div>
+          <div class="metric-caption" id="disp-direction-tag">Esperando selección</div>
         </div>
-        
-        <!-- Esfera con 4 sectores -->
-        <svg class="quadrant-widget" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="46" fill="#0b0f17" stroke="#334155" stroke-width="1.5" />
-          
-          <!-- Cuadrante 4: Arriba-Izquierda (Oeste -> Norte) -->
-          <path id="sec-4" class="q-sector" d="M 50 50 L 50 8 A 42 42 0 0 0 8 50 Z" />
-          
-          <!-- Cuadrante 1: Arriba-Derecha (Norte -> Este) -->
-          <path id="sec-1" class="q-sector" d="M 50 50 L 92 50 A 42 42 0 0 0 50 8 Z" />
-          
-          <!-- Cuadrante 2: Abajo-Derecha (Este -> Sur) -->
-          <path id="sec-2" class="q-sector" d="M 50 50 L 50 92 A 42 42 0 0 0 92 50 Z" />
-          
-          <!-- Cuadrante 3: Abajo-Izquierda (Sur -> Oeste) -->
-          <path id="sec-3" class="q-sector" d="M 50 50 L 8 50 A 42 42 0 0 0 50 92 Z" />
-          
-          <!-- Centro y letras cardinales -->
-          <circle cx="50" cy="50" r="7" fill="#090d16" stroke="#475569" stroke-width="1" />
-          <text x="50" y="16" class="q-cardinal">N</text>
-          <text x="84" y="50" class="q-cardinal">E</text>
-          <text x="50" y="84" class="q-cardinal">S</text>
-          <text x="16" y="50" class="q-cardinal">O</text>
+
+        <!-- Altitud teórica para inclinómetro del telescopio -->
+        <div class="metric-card">
+          <div class="metric-label">Altitud (Inclinómetro)</div>
+          <div class="metric-val cyan" id="disp-altitude">--°</div>
+          <div class="metric-caption" id="disp-altitude-tag">Elevación angular</div>
+        </div>
+      </div>
+
+      <!-- Indicación inequívoca sin margen de error -->
+      <div class="direction-banner" id="banner-direction">
+        <strong>Paso previo:</strong> Alinea la marca <strong>0°</strong> de la base del trípode al <strong>Norte geográfico</strong> exacto y nivela las patas.
+      </div>
+
+      <!-- Representación visual hiperclara del tambor graduado tipo rótula con mando naranja -->
+      <div class="visualizer-container">
+        <svg class="tripod-svg" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="collarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1e293b"/>
+              <stop offset="25%" stop-color="#475569"/>
+              <stop offset="50%" stop-color="#64748b"/>
+              <stop offset="75%" stop-color="#475569"/>
+              <stop offset="100%" stop-color="#1e293b"/>
+            </linearGradient>
+
+            <linearGradient id="bodyDark" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#1e293b"/>
+              <stop offset="60%" stop-color="#0f172a"/>
+              <stop offset="100%" stop-color="#020617"/>
+            </linearGradient>
+
+            <radialGradient id="knobRadial" cx="45%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#fdba74"/>
+              <stop offset="35%" stop-color="#f97316"/>
+              <stop offset="80%" stop-color="#ea580c"/>
+              <stop offset="100%" stop-color="#9a3412"/>
+            </radialGradient>
+
+            <linearGradient id="sideKnobGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ea580c"/>
+              <stop offset="40%" stop-color="#fb923c"/>
+              <stop offset="70%" stop-color="#ea580c"/>
+              <stop offset="100%" stop-color="#9a3412"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Marco contenedor estético -->
+          <rect x="0" y="0" width="420" height="220" rx="10" fill="#060b13" stroke="#1e293b"/>
+
+          <!-- Columna / vástago inferior del trípode -->
+          <rect x="195" y="176" width="30" height="44" fill="#0b0f19" stroke="#1f2937" stroke-width="1.5"/>
+          <line x1="202" y1="176" x2="202" y2="220" stroke="#334155" stroke-width="1.5"/>
+          <line x1="210" y1="176" x2="210" y2="220" stroke="#1e293b" stroke-width="2"/>
+          <line x1="218" y1="176" x2="218" y2="220" stroke="#334155" stroke-width="1.5"/>
+
+          <!-- Anillo estriado inferior de apriete -->
+          <rect x="175" y="160" width="70" height="18" rx="3" fill="#182234" stroke="#334155" stroke-width="1.5"/>
+          <line x1="183" y1="160" x2="183" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="192" y1="160" x2="192" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="201" y1="160" x2="201" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="210" y1="160" x2="210" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="219" y1="160" x2="219" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="228" y1="160" x2="228" y2="178" stroke="#090e17" stroke-width="2"/>
+          <line x1="237" y1="160" x2="237" y2="178" stroke="#090e17" stroke-width="2"/>
+
+          <!-- Bloque del cabezal cilíndrico de la rótula -->
+          <rect x="145" y="28" width="130" height="92" rx="4" fill="url(#bodyDark)" stroke="#374151" stroke-width="1.5"/>
+
+          <!-- Mando naranja lateral moleteado (bloqueo panorámico derecho) -->
+          <rect x="275" y="34" width="20" height="44" rx="4" fill="url(#sideKnobGrad)" stroke="#7c2d12" stroke-width="1.5"/>
+          <line x1="280" y1="36" x2="280" y2="76" stroke="#fed7aa" stroke-width="1.5"/>
+          <line x1="285" y1="36" x2="285" y2="76" stroke="#9a3412" stroke-width="1.5"/>
+          <line x1="290" y1="36" x2="290" y2="76" stroke="#fed7aa" stroke-width="1.5"/>
+
+          <!-- Mando grande frontal naranja (inspirado en la foto del usuario) -->
+          <g transform="translate(186, 52)">
+            <circle cx="0" cy="0" r="24" fill="url(#knobRadial)" stroke="#c2410c" stroke-width="2"/>
+            <circle cx="0" cy="0" r="22" fill="none" stroke="#7c2d12" stroke-dasharray="3.5,3.5" stroke-width="3"/>
+            <circle cx="0" cy="0" r="9" fill="#c2410c" opacity="0.6"/>
+            <circle cx="-3" cy="-4" r="3" fill="#ffedd5" opacity="0.7"/>
+          </g>
+
+          <!-- ANILLO GRADUADO METÁLICO (Tambor panorámico 0-90-0-90) -->
+          <rect x="130" y="120" width="160" height="38" rx="4" fill="url(#collarGrad)" stroke="#64748b" stroke-width="1.5"/>
+
+          <!-- Marcas y números dinámicos proyectados en la escala -->
+          <g id="svg-ticks-layer">
+            <!-- Inyectado por JavaScript -->
+          </g>
+
+          <!-- Índice de referencia fijo (Línea roja grabada en el cuerpo fijo) -->
+          <polygon points="210,118 204,110 216,110" fill="#ef4444" stroke="#7f1d1d" stroke-width="1"/>
+          <line x1="210" y1="118" x2="210" y2="152" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="2,2"/>
+          <circle cx="210" cy="110" r="2.5" fill="#fecaca"/>
+          <text x="210" y="104" font-size="7.5" fill="#ef4444" font-weight="900" text-anchor="middle">ÍNDICE FIJO</text>
+
+          <!-- Flecha de giro dinámico -->
+          <g id="svg-arrow-layer" transform="translate(210, 160)">
+            <!-- Inyectado por JavaScript -->
+          </g>
+
+          <!-- Carteles informativos superiores en la esquina del visor -->
+          <rect x="12" y="14" width="124" height="52" rx="7" fill="#0b1320" stroke="#1e293b"/>
+          <text x="20" y="30" font-size="8" fill="#94a3b8" font-weight="800">MARCA TRÍPODE:</text>
+          <text x="20" y="55" id="svg-hud-dial" font-size="22" fill="#fb923c" font-weight="900">--°</text>
+
+          <rect x="284" y="14" width="124" height="52" rx="7" fill="#0b1320" stroke="#1e293b"/>
+          <text x="292" y="30" font-size="8" fill="#94a3b8" font-weight="800">AZIMUT REAL 360°:</text>
+          <text x="292" y="55" id="svg-hud-az" font-size="20" fill="#38bdf8" font-weight="900">--°</text>
         </svg>
-      </div>
 
-      <div class="coords-grid">
-        <div class="coord-box">
-          <div class="coord-label">Azimut 360°</div>
-          <div class="coord-val" id="disp-az">--°</div>
+        <!-- Cuadrante y Rosa de los 4 sectores -->
+        <div class="visual-footer">
+          <svg class="compass-disc" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46" fill="#070c14" stroke="#334155" stroke-width="1.5" />
+            
+            <!-- Sector 1: N -> E (0° a 90° Horario) -->
+            <path id="quad-1" class="sector-poly" d="M 50 50 L 50 8 A 42 42 0 0 1 92 50 Z" />
+            <!-- Sector 2: E -> S (90° a 180° Horario) -->
+            <path id="quad-2" class="sector-poly" d="M 50 50 L 92 50 A 42 42 0 0 1 50 92 Z" />
+            <!-- Sector 3: S -> O (180° a 270° Horario) -->
+            <path id="quad-3" class="sector-poly" d="M 50 50 L 50 92 A 42 42 0 0 1 8 50 Z" />
+            <!-- Sector 4: O -> N (270° a 360° Horario) -->
+            <path id="quad-4" class="sector-poly" d="M 50 50 L 8 50 A 42 42 0 0 1 50 8 Z" />
+
+            <line x1="50" y1="8" x2="50" y2="92" stroke="#334155" stroke-width="1"/>
+            <line x1="8" y1="50" x2="92" y2="50" stroke="#334155" stroke-width="1"/>
+
+            <circle cx="50" cy="50" r="6" fill="#0b1320" stroke="#475569" stroke-width="1.5"/>
+
+            <text x="50" y="16" class="cardinal-label">0° N</text>
+            <text x="84" y="50" class="cardinal-label">90° E</text>
+            <text x="50" y="84" class="cardinal-label">0° S</text>
+            <text x="16" y="50" class="cardinal-label">90° O</text>
+          </svg>
+
+          <div class="sector-text-legend">
+            <div class="legend-item" id="leg-1">
+              <span class="legend-bullet" id="bullet-1"></span>
+              <span><strong>0° N ➔ 90° E:</strong> Horario desde el Norte</span>
+            </div>
+            <div class="legend-item" id="leg-2">
+              <span class="legend-bullet" id="bullet-2"></span>
+              <span><strong>90° E ➔ 0° S:</strong> Hacia el Sur (Marca = 180°-Az)</span>
+            </div>
+            <div class="legend-item" id="leg-3">
+              <span class="legend-bullet" id="bullet-3"></span>
+              <span><strong>0° S ➔ 90° O:</strong> Horario desde el Sur (Az-180°)</span>
+            </div>
+            <div class="legend-item" id="leg-4">
+              <span class="legend-bullet" id="bullet-4"></span>
+              <span><strong>90° O ➔ 0° N:</strong> Antihorario desde el Norte (360°-Az)</span>
+            </div>
+          </div>
         </div>
-        <div class="coord-box">
-          <div class="coord-label">Altitud Teórica</div>
-          <div class="coord-val" id="disp-alt">--°</div>
+      </div>
+    </div>
+
+    <!-- Selección y Búsqueda de Objetos Messier -->
+    <div class="card">
+      <div class="filter-bar">
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Buscar: M31, Orión, Galaxia..." 
+          oninput="handleSearch()"
+        />
+        <button class="btn-chip active" id="chip-visible" onclick="toggleOnlyVisible()">
+          Solo Visibles
+        </button>
+      </div>
+
+      <select id="object-select" onchange="onObjectSelected()"></select>
+
+      <!-- Ficha rápida del objeto seleccionado -->
+      <div class="object-card-meta">
+        <div class="meta-box">
+          <div class="meta-title">Tipo</div>
+          <div class="meta-value" id="meta-type">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-title">Constelación</div>
+          <div class="meta-value" id="meta-con">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-title">Magnitud Ap.</div>
+          <div class="meta-value" id="meta-mag">--</div>
         </div>
       </div>
+    </div>
 
-      <div class="sensor-reading">
-        Elevación actual del sensor: <strong id="disp-sensor">--°</strong>
+    <!-- Barra de Ubicación / GPS -->
+    <div class="card">
+      <div class="loc-bar">
+        <span id="loc-text">Coord: 37.18° N, -5.78° O (Hora local)</span>
+        <button class="btn-mini" onclick="requestGPS()">📡 Usar mi GPS</button>
       </div>
 
-      <div class="target-banner" id="banner-status">INCLINA EL TUBO</div>
+      <details>
+        <summary>¿Cómo interpretar la escala 0-90-0-90 de mi trípode?</summary>
+        <p>
+          Tu trípode tiene un limbo continuo de 360° dividido en cuatro cuadrantes de 90°.
+          Al alinear la marca <strong>0° del trípode al Norte geográfico</strong>:
+        </p>
+        <p>• La marca <strong>90° derecha</strong> coincide con el <strong>Este</strong>.</p>
+        <p>• La segunda marca <strong>0°</strong> coincide con el <strong>Sur</strong>.</p>
+        <p>• La marca <strong>90° izquierda</strong> coincide con el <strong>Oeste</strong>.</p>
+        <p>
+          Esta aplicación calcula automáticamente en qué cuadrante cae el astro y qué marca física exacta debes alinear con el índice rojo.
+        </p>
+      </details>
     </div>
   </div>
 
   <script>
     const MESSIER_DATA = [
-      { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", ra: 5.575, dec: 22.01 },
-      { id: "M2", name: "Cúmulo globular", con: "Aqr", ra: 21.558, dec: -0.82 },
-      { id: "M3", name: "Cúmulo globular", con: "CVn", ra: 13.703, dec: 28.38 },
-      { id: "M4", name: "Cúmulo globular", con: "Sco", ra: 16.393, dec: -26.53 },
-      { id: "M5", name: "Cúmulo globular", con: "Ser", ra: 15.309, dec: 2.08 },
-      { id: "M6", name: "Cúmulo de la Mariposa", con: "Sco", ra: 17.668, dec: -32.22 },
-      { id: "M7", name: "Cúmulo de Ptolomeo", con: "Sco", ra: 17.898, dec: -34.82 },
-      { id: "M8", name: "Nebulosa de la Laguna", con: "Sgr", ra: 18.063, dec: -24.38 },
-      { id: "M9", name: "Cúmulo globular", con: "Oph", ra: 17.320, dec: -18.52 },
-      { id: "M10", name: "Cúmulo globular", con: "Oph", ra: 16.952, dec: -4.10 },
-      { id: "M11", name: "Cúmulo del Pato Salvaje", con: "Sct", ra: 18.852, dec: -6.27 },
-      { id: "M12", name: "Cúmulo globular", con: "Oph", ra: 16.787, dec: -1.95 },
-      { id: "M13", name: "Gran Cúmulo de Hércules", con: "Her", ra: 16.695, dec: 36.46 },
-      { id: "M14", name: "Cúmulo globular", con: "Oph", ra: 17.627, dec: -3.25 },
-      { id: "M15", name: "Cúmulo globular", con: "Peg", ra: 21.500, dec: 12.17 },
-      { id: "M16", name: "Nebulosa del Águila", con: "Ser", ra: 18.313, dec: -13.79 },
-      { id: "M17", name: "Nebulosa Omega / Cisne", con: "Sgr", ra: 18.347, dec: -16.18 },
-      { id: "M18", name: "Cúmulo abierto", con: "Sgr", ra: 18.332, dec: -17.13 },
-      { id: "M19", name: "Cúmulo globular", con: "Oph", ra: 17.043, dec: -26.27 },
-      { id: "M20", name: "Nebulosa Trífida", con: "Sgr", ra: 18.038, dec: -23.03 },
-      { id: "M21", name: "Cúmulo abierto", con: "Sgr", ra: 18.077, dec: -22.50 },
-      { id: "M22", name: "Cúmulo globular", con: "Sgr", ra: 18.607, dec: -23.90 },
-      { id: "M23", name: "Cúmulo abierto", con: "Sgr", ra: 17.948, dec: -19.02 },
-      { id: "M24", name: "Nube Estelar de Sagitario", con: "Sgr", ra: 18.283, dec: -18.55 },
-      { id: "M25", name: "Cúmulo abierto", con: "Sgr", ra: 18.527, dec: -19.12 },
-      { id: "M26", name: "Cúmulo abierto", con: "Sct", ra: 18.753, dec: -9.40 },
-      { id: "M27", name: "Nebulosa Dumbbell", con: "Vul", ra: 19.993, dec: 22.72 },
-      { id: "M28", name: "Cúmulo globular", con: "Sgr", ra: 18.409, dec: -24.87 },
-      { id: "M29", name: "Cúmulo abierto", con: "Cyg", ra: 20.398, dec: 38.53 },
-      { id: "M30", name: "Cúmulo globular", con: "Cap", ra: 21.673, dec: -23.18 },
-      { id: "M31", name: "Galaxia de Andrómeda", con: "And", ra: 0.712, dec: 41.27 },
-      { id: "M32", name: "Satélite de Andrómeda", con: "And", ra: 0.712, dec: 40.87 },
-      { id: "M33", name: "Galaxia del Triángulo", con: "Tri", ra: 1.564, dec: 30.65 },
-      { id: "M34", name: "Cúmulo abierto", con: "Per", ra: 2.701, dec: 42.78 },
-      { id: "M35", name: "Cúmulo abierto", con: "Gem", ra: 6.148, dec: 24.33 },
-      { id: "M36", name: "Cúmulo abierto", con: "Aur", ra: 5.602, dec: 34.14 },
-      { id: "M37", name: "Cúmulo abierto", con: "Aur", ra: 5.873, dec: 32.55 },
-      { id: "M38", name: "Cúmulo abierto", con: "Aur", ra: 5.478, dec: 35.85 },
-      { id: "M39", name: "Cúmulo abierto", con: "Cyg", ra: 21.537, dec: 48.43 },
-      { id: "M40", name: "Winnecke 4", con: "UMa", ra: 12.370, dec: 58.08 },
-      { id: "M41", name: "Cúmulo abierto", con: "CMa", ra: 6.783, dec: -20.73 },
-      { id: "M42", name: "Nebulosa de Orión", con: "Ori", ra: 5.588, dec: -5.39 },
-      { id: "M43", name: "Nebulosa de De Mairan", con: "Ori", ra: 5.592, dec: -5.27 },
-      { id: "M44", name: "El Pesebre", con: "Cnc", ra: 8.673, dec: 19.67 },
-      { id: "M45", name: "Las Pléyades", con: "Tau", ra: 3.790, dec: 24.11 },
-      { id: "M46", name: "Cúmulo abierto", con: "Pup", ra: 7.697, dec: -14.82 },
-      { id: "M47", name: "Cúmulo abierto", con: "Pup", ra: 7.610, dec: -14.50 },
-      { id: "M48", name: "Cúmulo abierto", con: "Hya", ra: 8.230, dec: -5.80 },
-      { id: "M49", name: "Galaxia elíptica", con: "Vir", ra: 12.496, dec: 8.00 },
-      { id: "M50", name: "Cúmulo abierto", con: "Mon", ra: 7.053, dec: -8.37 },
-      { id: "M51", name: "Galaxia Remolino", con: "CVn", ra: 13.498, dec: 47.19 },
-      { id: "M52", name: "Cúmulo abierto", con: "Cas", ra: 23.403, dec: 61.59 },
-      { id: "M53", name: "Cúmulo globular", con: "Com", ra: 13.215, dec: 18.17 },
-      { id: "M54", name: "Cúmulo globular", con: "Sgr", ra: 18.918, dec: -30.48 },
-      { id: "M55", name: "Cúmulo globular", con: "Sgr", ra: 19.667, dec: -30.96 },
-      { id: "M56", name: "Cúmulo globular", con: "Lyr", ra: 19.277, dec: 30.18 },
-      { id: "M57", name: "Nebulosa del Anillo", con: "Lyr", ra: 18.893, dec: 33.03 },
-      { id: "M58", name: "Galaxia espiral", con: "Vir", ra: 12.628, dec: 11.82 },
-      { id: "M59", name: "Galaxia elíptica", con: "Vir", ra: 12.700, dec: 11.65 },
-      { id: "M60", name: "Galaxia elíptica", con: "Vir", ra: 12.728, dec: 11.55 },
-      { id: "M61", name: "Galaxia espiral", con: "Vir", ra: 12.366, dec: 4.47 },
-      { id: "M62", name: "Cúmulo globular", con: "Oph", ra: 17.020, dec: -30.11 },
-      { id: "M63", name: "Galaxia del Girasol", con: "CVn", ra: 13.264, dec: 42.03 },
-      { id: "M64", name: "Galaxia Ojo Negro", con: "Com", ra: 12.945, dec: 21.68 },
-      { id: "M65", name: "Triplete de Leo", con: "Leo", ra: 11.315, dec: 13.09 },
-      { id: "M66", name: "Triplete de Leo", con: "Leo", ra: 11.337, dec: 12.99 },
-      { id: "M67", name: "Cúmulo abierto", con: "Cnc", ra: 8.847, dec: 11.82 },
-      { id: "M68", name: "Cúmulo globular", con: "Hya", ra: 12.658, dec: -26.75 },
-      { id: "M69", name: "Cúmulo globular", con: "Sgr", ra: 18.523, dec: -32.35 },
-      { id: "M70", name: "Cúmulo globular", con: "Sgr", ra: 18.720, dec: -32.30 },
-      { id: "M71", name: "Cúmulo globular", con: "Sge", ra: 19.897, dec: 18.78 },
-      { id: "M72", name: "Cúmulo globular", con: "Aqr", ra: 20.892, dec: -12.54 },
-      { id: "M73", name: "Asterismo", con: "Aqr", ra: 20.982, dec: -12.63 },
-      { id: "M74", name: "Galaxia espiral", con: "Psc", ra: 1.611, dec: 15.78 },
-      { id: "M75", name: "Cúmulo globular", con: "Sgr", ra: 20.102, dec: -21.92 },
-      { id: "M76", name: "Pequeña Dumbbell", con: "Per", ra: 1.706, dec: 51.58 },
-      { id: "M77", name: "Cetus A", con: "Cet", ra: 2.711, dec: -0.01 },
-      { id: "M78", name: "Nebulosa difusa", con: "Ori", ra: 5.779, dec: 0.08 },
-      { id: "M79", name: "Cúmulo globular", con: "Lep", ra: 5.409, dec: -24.52 },
-      { id: "M80", name: "Cúmulo globular", con: "Sco", ra: 16.284, dec: -22.97 },
-      { id: "M81", name: "Galaxia de Bode", con: "UMa", ra: 9.926, dec: 69.07 },
-      { id: "M82", name: "Galaxia del Cigarro", con: "UMa", ra: 9.931, dec: 69.68 },
-      { id: "M83", name: "Molinillo Austral", con: "Hya", ra: 13.617, dec: -29.87 },
-      { id: "M84", name: "Galaxia lenticular", con: "Vir", ra: 12.418, dec: 12.89 },
-      { id: "M85", name: "Galaxia lenticular", con: "Com", ra: 12.423, dec: 18.19 },
-      { id: "M86", name: "Galaxia lenticular", con: "Vir", ra: 12.436, dec: 12.95 },
-      { id: "M87", name: "Virgo A", con: "Vir", ra: 12.514, dec: 12.39 },
-      { id: "M88", name: "Galaxia espiral", con: "Com", ra: 12.533, dec: 14.42 },
-      { id: "M89", name: "Galaxia elíptica", con: "Vir", ra: 12.594, dec: 12.56 },
-      { id: "M90", name: "Galaxia espiral", con: "Vir", ra: 12.614, dec: 13.16 },
-      { id: "M91", name: "Galaxia espiral", con: "Com", ra: 12.590, dec: 14.50 },
-      { id: "M92", name: "Cúmulo globular", con: "Her", ra: 17.285, dec: 43.14 },
-      { id: "M93", name: "Cúmulo abierto", con: "Pup", ra: 7.743, dec: -23.85 },
-      { id: "M94", name: "Galaxia espiral", con: "CVn", ra: 12.848, dec: 41.12 },
-      { id: "M95", name: "Galaxia espiral", con: "Leo", ra: 10.733, dec: 11.70 },
-      { id: "M96", name: "Galaxia espiral", con: "Leo", ra: 10.779, dec: 11.82 },
-      { id: "M97", name: "Nebulosa del Búho", con: "UMa", ra: 11.247, dec: 55.02 },
-      { id: "M98", name: "Galaxia espiral", con: "Com", ra: 12.230, dec: 14.90 },
-      { id: "M99", name: "Galaxia espiral", con: "Com", ra: 12.314, dec: 14.42 },
-      { id: "M100", name: "Galaxia espiral", con: "Com", ra: 12.382, dec: 15.82 },
-      { id: "M101", name: "Galaxia del Molinillo", con: "UMa", ra: 14.053, dec: 54.35 },
-      { id: "M102", name: "Galaxia del Huso", con: "Dra", ra: 15.110, dec: 55.76 },
-      { id: "M103", name: "Cúmulo abierto", con: "Cas", ra: 1.553, dec: 60.70 },
-      { id: "M104", name: "Galaxia del Sombrero", con: "Vir", ra: 12.666, dec: -11.62 },
-      { id: "M105", name: "Galaxia elíptica", con: "Leo", ra: 10.797, dec: 12.58 },
-      { id: "M106", name: "Galaxia espiral", con: "CVn", ra: 12.316, dec: 47.30 },
-      { id: "M107", name: "Cúmulo globular", con: "Oph", ra: 16.542, dec: -13.05 },
-      { id: "M108", name: "Galaxia espiral", con: "UMa", ra: 11.192, dec: 55.67 },
-      { id: "M109", name: "Galaxia espiral", con: "UMa", ra: 11.960, dec: 53.37 },
-      { id: "M110", name: "Satélite de Andrómeda", con: "And", ra: 0.673, dec: 41.68 }
+      { id: "M1", name: "Nebulosa del Cangrejo", con: "Tau", type: "Remanente Supernova", mag: 8.4, ra: 5.575, dec: 22.01 },
+      { id: "M2", name: "Cúmulo globular", con: "Aqr", type: "Cúmulo Globular", mag: 6.5, ra: 21.558, dec: -0.82 },
+      { id: "M3", name: "Cúmulo globular", con: "CVn", type: "Cúmulo Globular", mag: 6.2, ra: 13.703, dec: 28.38 },
+      { id: "M4", name: "Cúmulo globular", con: "Sco", type: "Cúmulo Globular", mag: 5.9, ra: 16.393, dec: -26.53 },
+      { id: "M5", name: "Cúmulo globular", con: "Ser", type: "Cúmulo Globular", mag: 5.6, ra: 15.309, dec: 2.08 },
+      { id: "M6", name: "Cúmulo de la Mariposa", con: "Sco", type: "Cúmulo Abierto", mag: 4.2, ra: 17.668, dec: -32.22 },
+      { id: "M7", name: "Cúmulo de Ptolomeo", con: "Sco", type: "Cúmulo Abierto", mag: 3.3, ra: 17.898, dec: -34.82 },
+      { id: "M8", name: "Nebulosa de la Laguna", con: "Sgr", type: "Nebulosa Emisión", mag: 6.0, ra: 18.063, dec: -24.38 },
+      { id: "M9", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 7.7, ra: 17.320, dec: -18.52 },
+      { id: "M10", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 6.6, ra: 16.952, dec: -4.10 },
+      { id: "M11", name: "Pato Salvaje", con: "Sct", type: "Cúmulo Abierto", mag: 5.8, ra: 18.852, dec: -6.27 },
+      { id: "M12", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 6.7, ra: 16.787, dec: -1.95 },
+      { id: "M13", name: "Gran Cúmulo de Hércules", con: "Her", type: "Cúmulo Globular", mag: 5.8, ra: 16.695, dec: 36.46 },
+      { id: "M14", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 7.6, ra: 17.627, dec: -3.25 },
+      { id: "M15", name: "Cúmulo globular", con: "Peg", type: "Cúmulo Globular", mag: 6.2, ra: 21.500, dec: 12.17 },
+      { id: "M16", name: "Nebulosa del Águila", con: "Ser", type: "Nebulosa / Cúmulo", mag: 6.0, ra: 18.313, dec: -13.79 },
+      { id: "M17", name: "Nebulosa del Cisne / Omega", con: "Sgr", type: "Nebulosa Emisión", mag: 6.0, ra: 18.347, dec: -16.18 },
+      { id: "M18", name: "Cúmulo abierto", con: "Sgr", type: "Cúmulo Abierto", mag: 7.5, ra: 18.332, dec: -17.13 },
+      { id: "M19", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 6.8, ra: 17.043, dec: -26.27 },
+      { id: "M20", name: "Nebulosa Trífida", con: "Sgr", type: "Nebulosa Difusa", mag: 6.3, ra: 18.038, dec: -23.03 },
+      { id: "M21", name: "Cúmulo abierto", con: "Sgr", type: "Cúmulo Abierto", mag: 6.5, ra: 18.077, dec: -22.50 },
+      { id: "M22", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 5.1, ra: 18.607, dec: -23.90 },
+      { id: "M23", name: "Cúmulo abierto", con: "Sgr", type: "Cúmulo Abierto", mag: 5.5, ra: 17.948, dec: -19.02 },
+      { id: "M24", name: "Nube Estelar de Sagitario", con: "Sgr", type: "Nube Estelar", mag: 4.6, ra: 18.283, dec: -18.55 },
+      { id: "M25", name: "Cúmulo abierto", con: "Sgr", type: "Cúmulo Abierto", mag: 4.6, ra: 18.527, dec: -19.12 },
+      { id: "M26", name: "Cúmulo abierto", con: "Sct", type: "Cúmulo Abierto", mag: 8.0, ra: 18.753, dec: -9.40 },
+      { id: "M27", name: "Nebulosa Dumbbell", con: "Vul", type: "Nebulosa Planetaria", mag: 7.4, ra: 19.993, dec: 22.72 },
+      { id: "M28", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 6.8, ra: 18.409, dec: -24.87 },
+      { id: "M29", name: "Cúmulo abierto", con: "Cyg", type: "Cúmulo Abierto", mag: 7.1, ra: 20.398, dec: 38.53 },
+      { id: "M30", name: "Cúmulo globular", con: "Cap", type: "Cúmulo Globular", mag: 7.2, ra: 21.673, dec: -23.18 },
+      { id: "M31", name: "Galaxia de Andrómeda", con: "And", type: "Galaxia Espiral", mag: 3.4, ra: 0.712, dec: 41.27 },
+      { id: "M32", name: "Satélite de Andrómeda", con: "And", type: "Galaxia Elíptica", mag: 8.1, ra: 0.712, dec: 40.87 },
+      { id: "M33", name: "Galaxia del Triángulo", con: "Tri", type: "Galaxia Espiral", mag: 5.7, ra: 1.564, dec: 30.65 },
+      { id: "M34", name: "Cúmulo abierto", con: "Per", type: "Cúmulo Abierto", mag: 5.5, ra: 2.701, dec: 42.78 },
+      { id: "M35", name: "Cúmulo abierto", con: "Gem", type: "Cúmulo Abierto", mag: 5.3, ra: 6.148, dec: 24.33 },
+      { id: "M36", name: "Cúmulo abierto", con: "Aur", type: "Cúmulo Abierto", mag: 6.3, ra: 5.602, dec: 34.14 },
+      { id: "M37", name: "Cúmulo abierto", con: "Aur", type: "Cúmulo Abierto", mag: 6.2, ra: 5.873, dec: 32.55 },
+      { id: "M38", name: "Cúmulo abierto", con: "Aur", type: "Cúmulo Abierto", mag: 7.4, ra: 5.478, dec: 35.85 },
+      { id: "M39", name: "Cúmulo abierto", con: "Cyg", type: "Cúmulo Abierto", mag: 4.6, ra: 21.537, dec: 48.43 },
+      { id: "M40", name: "Winnecke 4 (Doble)", con: "UMa", type: "Estrella Doble", mag: 9.7, ra: 12.370, dec: 58.08 },
+      { id: "M41", name: "Cúmulo abierto", con: "CMa", type: "Cúmulo Abierto", mag: 4.5, ra: 6.783, dec: -20.73 },
+      { id: "M42", name: "Gran Nebulosa de Orión", con: "Ori", type: "Nebulosa Difusa", mag: 4.0, ra: 5.588, dec: -5.39 },
+      { id: "M43", name: "Nebulosa de De Mairan", con: "Ori", type: "Nebulosa Emisión", mag: 9.0, ra: 5.592, dec: -5.27 },
+      { id: "M44", name: "El Pesebre (Colmena)", con: "Cnc", type: "Cúmulo Abierto", mag: 3.7, ra: 8.673, dec: 19.67 },
+      { id: "M45", name: "Las Pléyades", con: "Tau", type: "Cúmulo Abierto", mag: 1.6, ra: 3.790, dec: 24.11 },
+      { id: "M46", name: "Cúmulo abierto", con: "Pup", type: "Cúmulo Abierto", mag: 6.0, ra: 7.697, dec: -14.82 },
+      { id: "M47", name: "Cúmulo abierto", con: "Pup", type: "Cúmulo Abierto", mag: 4.2, ra: 7.610, dec: -14.50 },
+      { id: "M48", name: "Cúmulo abierto", con: "Hya", type: "Cúmulo Abierto", mag: 5.5, ra: 8.230, dec: -5.80 },
+      { id: "M49", name: "Galaxia elíptica", con: "Vir", type: "Galaxia Elíptica", mag: 8.4, ra: 12.496, dec: 8.00 },
+      { id: "M50", name: "Cúmulo abierto", con: "Mon", type: "Cúmulo Abierto", mag: 5.9, ra: 7.053, dec: -8.37 },
+      { id: "M51", name: "Galaxia Remolino", con: "CVn", type: "Galaxia Espiral", mag: 8.4, ra: 13.498, dec: 47.19 },
+      { id: "M52", name: "Cúmulo abierto", con: "Cas", type: "Cúmulo Abierto", mag: 7.3, ra: 23.403, dec: 61.59 },
+      { id: "M53", name: "Cúmulo globular", con: "Com", type: "Cúmulo Globular", mag: 7.6, ra: 13.215, dec: 18.17 },
+      { id: "M54", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 7.6, ra: 18.918, dec: -30.48 },
+      { id: "M55", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 6.3, ra: 19.667, dec: -30.96 },
+      { id: "M56", name: "Cúmulo globular", con: "Lyr", type: "Cúmulo Globular", mag: 8.3, ra: 19.277, dec: 30.18 },
+      { id: "M57", name: "Nebulosa del Anillo", con: "Lyr", type: "Nebulosa Planetaria", mag: 8.8, ra: 18.893, dec: 33.03 },
+      { id: "M58", name: "Galaxia espiral", con: "Vir", type: "Galaxia Espiral", mag: 9.7, ra: 12.628, dec: 11.82 },
+      { id: "M59", name: "Galaxia elíptica", con: "Vir", type: "Galaxia Elíptica", mag: 9.6, ra: 12.700, dec: 11.65 },
+      { id: "M60", name: "Galaxia elíptica", con: "Vir", type: "Galaxia Elíptica", mag: 8.8, ra: 12.728, dec: 11.55 },
+      { id: "M61", name: "Galaxia espiral", con: "Vir", type: "Galaxia Espiral", mag: 9.7, ra: 12.366, dec: 4.47 },
+      { id: "M62", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 6.5, ra: 17.020, dec: -30.11 },
+      { id: "M63", name: "Galaxia del Girasol", con: "CVn", type: "Galaxia Espiral", mag: 8.6, ra: 13.264, dec: 42.03 },
+      { id: "M64", name: "Galaxia Ojo Negro", con: "Com", type: "Galaxia Espiral", mag: 8.5, ra: 12.945, dec: 21.68 },
+      { id: "M65", name: "Triplete de Leo", con: "Leo", type: "Galaxia Espiral", mag: 9.3, ra: 11.315, dec: 13.09 },
+      { id: "M66", name: "Triplete de Leo", con: "Leo", type: "Galaxia Espiral", mag: 8.9, ra: 11.337, dec: 12.99 },
+      { id: "M67", name: "Cúmulo abierto", con: "Cnc", type: "Cúmulo Abierto", mag: 6.1, ra: 8.847, dec: 11.82 },
+      { id: "M68", name: "Cúmulo globular", con: "Hya", type: "Cúmulo Globular", mag: 7.8, ra: 12.658, dec: -26.75 },
+      { id: "M69", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 7.6, ra: 18.523, dec: -32.35 },
+      { id: "M70", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 7.9, ra: 18.720, dec: -32.30 },
+      { id: "M71", name: "Cúmulo globular", con: "Sge", type: "Cúmulo Globular", mag: 8.2, ra: 19.897, dec: 18.78 },
+      { id: "M72", name: "Cúmulo globular", con: "Aqr", type: "Cúmulo Globular", mag: 9.3, ra: 20.892, dec: -12.54 },
+      { id: "M73", name: "Asterismo", con: "Aqr", type: "Asterismo", mag: 9.0, ra: 20.982, dec: -12.63 },
+      { id: "M74", name: "Galaxia espiral", con: "Psc", type: "Galaxia Espiral", mag: 9.4, ra: 1.611, dec: 15.78 },
+      { id: "M75", name: "Cúmulo globular", con: "Sgr", type: "Cúmulo Globular", mag: 8.5, ra: 20.102, dec: -21.92 },
+      { id: "M76", name: "Pequeña Dumbbell", con: "Per", type: "Nebulosa Planetaria", mag: 10.1, ra: 1.706, dec: 51.58 },
+      { id: "M77", name: "Cetus A", con: "Cet", type: "Galaxia Espiral", mag: 8.9, ra: 2.711, dec: -0.01 },
+      { id: "M78", name: "Nebulosa de Reflexión", con: "Ori", type: "Nebulosa Reflexión", mag: 8.3, ra: 5.779, dec: 0.08 },
+      { id: "M79", name: "Cúmulo globular", con: "Lep", type: "Cúmulo Globular", mag: 7.7, ra: 5.409, dec: -24.52 },
+      { id: "M80", name: "Cúmulo globular", con: "Sco", type: "Cúmulo Globular", mag: 7.3, ra: 16.284, dec: -22.97 },
+      { id: "M81", name: "Galaxia de Bode", con: "UMa", type: "Galaxia Espiral", mag: 6.9, ra: 9.926, dec: 69.07 },
+      { id: "M82", name: "Galaxia del Cigarro", con: "UMa", type: "Galaxia Irregular", mag: 8.4, ra: 9.931, dec: 69.68 },
+      { id: "M83", name: "Molinillo Austral", con: "Hya", type: "Galaxia Espiral", mag: 7.5, ra: 13.617, dec: -29.87 },
+      { id: "M84", name: "Galaxia lenticular", con: "Vir", type: "Galaxia Lenticular", mag: 9.1, ra: 12.418, dec: 12.89 },
+      { id: "M85", name: "Galaxia lenticular", con: "Com", type: "Galaxia Lenticular", mag: 9.1, ra: 12.423, dec: 18.19 },
+      { id: "M86", name: "Galaxia lenticular", con: "Vir", type: "Galaxia Lenticular", mag: 8.9, ra: 12.436, dec: 12.95 },
+      { id: "M87", name: "Virgo A", con: "Vir", type: "Galaxia Gigante", mag: 8.6, ra: 12.514, dec: 12.39 },
+      { id: "M88", name: "Galaxia espiral", con: "Com", type: "Galaxia Espiral", mag: 9.6, ra: 12.533, dec: 14.42 },
+      { id: "M89", name: "Galaxia elíptica", con: "Vir", type: "Galaxia Elíptica", mag: 9.8, ra: 12.594, dec: 12.56 },
+      { id: "M90", name: "Galaxia espiral", con: "Vir", type: "Galaxia Espiral", mag: 9.5, ra: 12.614, dec: 13.16 },
+      { id: "M91", name: "Galaxia espiral", con: "Com", type: "Galaxia Espiral", mag: 10.2, ra: 12.590, dec: 14.50 },
+      { id: "M92", name: "Cúmulo globular", con: "Her", type: "Cúmulo Globular", mag: 6.4, ra: 17.285, dec: 43.14 },
+      { id: "M93", name: "Cúmulo abierto", con: "Pup", type: "Cúmulo Abierto", mag: 6.0, ra: 7.743, dec: -23.85 },
+      { id: "M94", name: "Galaxia espiral", con: "CVn", type: "Galaxia Espiral", mag: 8.2, ra: 12.848, dec: 41.12 },
+      { id: "M95", name: "Galaxia espiral", con: "Leo", type: "Galaxia Espiral", mag: 9.7, ra: 10.733, dec: 11.70 },
+      { id: "M96", name: "Galaxia espiral", con: "Leo", type: "Galaxia Espiral", mag: 9.2, ra: 10.779, dec: 11.82 },
+      { id: "M97", name: "Nebulosa del Búho", con: "UMa", type: "Nebulosa Planetaria", mag: 9.9, ra: 11.247, dec: 55.02 },
+      { id: "M98", name: "Galaxia espiral", con: "Com", type: "Galaxia Espiral", mag: 10.1, ra: 12.230, dec: 14.90 },
+      { id: "M99", name: "Galaxia espiral", con: "Com", type: "Galaxia Espiral", mag: 9.9, ra: 12.314, dec: 14.42 },
+      { id: "M100", name: "Galaxia espiral", con: "Com", type: "Galaxia Espiral", mag: 9.3, ra: 12.382, dec: 15.82 },
+      { id: "M101", name: "Galaxia del Molinillo", con: "UMa", type: "Galaxia Espiral", mag: 7.9, ra: 14.053, dec: 54.35 },
+      { id: "M102", name: "Galaxia del Huso", con: "Dra", type: "Galaxia Lenticular", mag: 9.9, ra: 15.110, dec: 55.76 },
+      { id: "M103", name: "Cúmulo abierto", con: "Cas", type: "Cúmulo Abierto", mag: 7.4, ra: 1.553, dec: 60.70 },
+      { id: "M104", name: "Galaxia del Sombrero", con: "Vir", type: "Galaxia Espiral", mag: 8.0, ra: 12.666, dec: -11.62 },
+      { id: "M105", name: "Galaxia elíptica", con: "Leo", type: "Galaxia Elíptica", mag: 9.3, ra: 10.797, dec: 12.58 },
+      { id: "M106", name: "Galaxia espiral", con: "CVn", type: "Galaxia Espiral", mag: 8.4, ra: 12.316, dec: 47.30 },
+      { id: "M107", name: "Cúmulo globular", con: "Oph", type: "Cúmulo Globular", mag: 7.9, ra: 16.542, dec: -13.05 },
+      { id: "M108", name: "Galaxia espiral", con: "UMa", type: "Galaxia Espiral", mag: 10.0, ra: 11.192, dec: 55.67 },
+      { id: "M109", name: "Galaxia espiral", con: "UMa", type: "Galaxia Espiral", mag: 9.8, ra: 11.960, dec: 53.37 },
+      { id: "M110", name: "Satélite de Andrómeda", con: "And", type: "Galaxia Elíptica", mag: 8.5, ra: 0.673, dec: 41.68 }
     ];
 
+    // Variables de configuración de observación
     let userLat = 37.18;
     let userLon = -5.78;
     let onlyVisible = true;
-    let currentAltTarget = null;
-    let currentSensorPitch = null;
-    let audioCtx = null;
-    let lastBeep = 0;
+    let searchQuery = "";
 
-    function getLST(now, lon) {
-      const jd = (now.getTime() / 86400000) + 2440587.5;
+    // Cálculo del Tiempo Sidéreo Local (LST) en horas decimales
+    function getLST(date, lon) {
+      const jd = (date.getTime() / 86400000) + 2440587.5;
       const d = jd - 2451545.0;
       let gmst = 18.697374558 + 24.06570982441908 * d;
       gmst = ((gmst % 24) + 24) % 24;
@@ -456,6 +805,7 @@
       return ((lst % 24) + 24) % 24;
     }
 
+    // Conversión RA/Dec a Azimut (360°) y Altitud (grados decimales)
     function raDecToAltAz(ra, dec, lat, lst) {
       const d2r = Math.PI / 180;
       const r2d = 180 / Math.PI;
@@ -477,210 +827,310 @@
       return { az: az, alt: alt * r2d };
     }
 
-    function formatTripodQuadrant(az) {
-      let sector = "";
+    /*
+      Mapeo al tambor simétrico 0-90-0-90:
+      Con 0° alineado al Norte geográfico y 0° opuesto al Sur:
+      
+      - Cuadrante 1 (Az 0° a 90° - Norte a Este):
+        Marca del tambor = Az
+        Acción: Giro a la DERECHA (Horario ↻) desde la marca 0° del Norte hacia 90° Este.
+
+      - Cuadrante 2 (Az 90° a 180° - Este a Sur):
+        El tambor va de 90° (Este) descendiendo a 0° (Sur).
+        Marca del tambor = 180° - Az
+        Acción: Avanzar hacia el SUR ↻ (la marca va descendiendo hacia 0° Sur).
+
+      - Cuadrante 3 (Az 180° a 270° - Sur a Oeste):
+        El tambor sube desde 0° (Sur) hacia 90° (Oeste).
+        Marca del tambor = Az - 180°
+        Acción: Giro a la DERECHA ↻ desde el 0° del Sur hacia 90° Oeste.
+
+      - Cuadrante 4 (Az 270° a 360° - Oeste a Norte):
+        El tambor desciende desde 90° (Oeste) hacia 0° (Norte).
+        Marca del tambor = 360° - Az
+        Acción: Giro a la IZQUIERDA (Antihorario ↺) desde el 0° del Norte hacia el Oeste.
+    */
+    function resolveTripodGraduation(az) {
       let dial = 0;
-      let sectorNum = 1;
+      let quad = 1;
+      let directionTag = "";
+      let detailedBanner = "";
+      let arrowDirection = "right"; // 'right' o 'left'
 
       if (az >= 0 && az < 90) {
+        quad = 1;
         dial = az;
-        sector = "Norte ➔ Este (1er sector)";
-        sectorNum = 1;
+        arrowDirection = "right";
+        directionTag = "N ➔ E (Horario ↻)";
+        detailedBanner = `Gira a la <strong>DERECHA ↻</strong> desde el 0° del Norte hasta la marca <strong>${dial.toFixed(1)}°</strong> (Cuadrante Norte-Este).`;
       } else if (az >= 90 && az < 180) {
-        dial = az - 90;
-        sector = "Este ➔ Sur (2º sector)";
-        sectorNum = 2;
+        quad = 2;
+        dial = 180 - az;
+        arrowDirection = "right";
+        directionTag = "E ➔ S (Hacia 0° Sur)";
+        detailedBanner = `Pasa el 90° Este y pon la marca en <strong>${dial.toFixed(1)}°</strong> (a ${dial.toFixed(1)}° antes de alcanzar el 0° Sur).`;
       } else if (az >= 180 && az < 270) {
+        quad = 3;
         dial = az - 180;
-        sector = "Sur ➔ Oeste (3er sector)";
-        sectorNum = 3;
+        arrowDirection = "right";
+        directionTag = "S ➔ O (Horario ↻)";
+        detailedBanner = `Gira desde el 0° del Sur a la <strong>DERECHA ↻</strong> hacia el Oeste hasta la marca <strong>${dial.toFixed(1)}°</strong>.`;
       } else {
-        dial = az - 270;
-        sector = "Oeste ➔ Norte (4º sector)";
-        sectorNum = 4;
+        quad = 4;
+        dial = 360 - az;
+        arrowDirection = "left";
+        directionTag = "N ➔ O (Antihorario ↺)";
+        detailedBanner = `Gira a la <strong>IZQUIERDA ↺</strong> desde el 0° del Norte hacia el Oeste hasta la marca <strong>${dial.toFixed(1)}°</strong>.`;
       }
 
       return {
-        dial: `${dial.toFixed(1)}°`,
-        sector: sector,
-        sectorNum: sectorNum
+        dial: dial,
+        quad: quad,
+        directionTag: directionTag,
+        detailedBanner: detailedBanner,
+        arrowDirection: arrowDirection
       };
     }
 
-    function updateQuadrantGraphic(sectorNum) {
-      for (let i = 1; i <= 4; i++) {
-        const el = document.getElementById(`sec-${i}`);
-        if (el) {
-          if (i === sectorNum) {
-            el.classList.add('active');
-          } else {
-            el.classList.remove('active');
-          }
+    function renderSvgDial(dialVal, arrowDir) {
+      const ticksLayer = document.getElementById('svg-ticks-layer');
+      const arrowLayer = document.getElementById('svg-arrow-layer');
+      if (!ticksLayer || !arrowLayer) return;
+
+      ticksLayer.innerHTML = "";
+      arrowLayer.innerHTML = "";
+
+      const centerX = 210;
+      const pxPerDegree = 3.4;
+      const startDeg = Math.floor(dialVal - 20);
+      const endDeg = Math.ceil(dialVal + 20);
+
+      // Dibujar graduación en el tambor cilíndrico
+      for (let deg = startDeg; deg <= endDeg; deg++) {
+        let displayDeg = deg;
+        if (displayDeg < 0) displayDeg = Math.abs(displayDeg);
+        if (displayDeg > 90) displayDeg = 180 - displayDeg;
+        if (displayDeg < 0) displayDeg = 0;
+
+        const xPos = centerX + (deg - dialVal) * pxPerDegree;
+        if (xPos < 135 || xPos > 285) continue;
+
+        const isMajor = (deg % 10 === 0);
+        const isHalf = (deg % 5 === 0);
+        const tickH = isMajor ? 16 : (isHalf ? 10 : 6);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", xPos);
+        line.setAttribute("y1", 154 - tickH);
+        line.setAttribute("x2", xPos);
+        line.setAttribute("y2", 154);
+        line.setAttribute("stroke", isMajor ? "#ffffff" : (isHalf ? "#cbd5e1" : "#94a3b8"));
+        line.setAttribute("stroke-width", isMajor ? "1.8" : "1");
+        ticksLayer.appendChild(line);
+
+        if (isMajor && deg >= 0 && deg <= 90) {
+          const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          txt.setAttribute("x", xPos);
+          txt.setAttribute("y", 133);
+          txt.setAttribute("font-size", "8");
+          txt.setAttribute("fill", "#ffffff");
+          txt.setAttribute("font-weight", "bold");
+          txt.setAttribute("text-anchor", "middle");
+          txt.textContent = deg;
+          ticksLayer.appendChild(txt);
+        }
+      }
+
+      // Dibujar flecha indicadora del sentido de giro
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      if (arrowDir === "right") {
+        path.setAttribute("d", "M -32,5 Q 0,16 32,5 L 26,0 M 32,5 L 26,10");
+      } else {
+        path.setAttribute("d", "M 32,5 Q 0,16 -32,5 L -26,0 M -32,5 L -26,10");
+      }
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "#38bdf8");
+      path.setAttribute("stroke-width", "2.8");
+      path.setAttribute("stroke-linecap", "round");
+      arrowLayer.appendChild(path);
+    }
+
+    function updateCompassWidget(activeQuad) {
+      for (let q = 1; q <= 4; q++) {
+        const poly = document.getElementById(`quad-${q}`);
+        const bullet = document.getElementById(`bullet-${q}`);
+        if (poly) {
+          poly.classList.toggle('active', q === activeQuad);
+        }
+        if (bullet) {
+          bullet.classList.toggle('active', q === activeQuad);
         }
       }
     }
 
-    function populateSelect() {
+    function populateDropdown() {
       const select = document.getElementById('object-select');
-      const prevSelected = select.value;
+      const prevVal = select.value;
       select.innerHTML = "";
 
       const now = new Date();
       const lst = getLST(now, userLon);
 
-      MESSIER_DATA.forEach(obj => {
-        const { alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
-        if (onlyVisible && alt <= 0) return;
+      const filtered = MESSIER_DATA.filter(obj => {
+        const matchesQuery = 
+          obj.id.toLowerCase().includes(searchQuery) ||
+          obj.name.toLowerCase().includes(searchQuery) ||
+          obj.con.toLowerCase().includes(searchQuery) ||
+          obj.type.toLowerCase().includes(searchQuery);
 
+        if (!matchesQuery) return false;
+
+        if (onlyVisible) {
+          const { alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
+          if (alt <= 0) return false;
+        }
+
+        return true;
+      });
+
+      // Ordenar por altitud descendente si están visibles
+      filtered.sort((a, b) => {
+        const altA = raDecToAltAz(a.ra, a.dec, userLat, lst).alt;
+        const altB = raDecToAltAz(b.ra, b.dec, userLat, lst).alt;
+        return altB - altA;
+      });
+
+      if (filtered.length === 0) {
+        const emptyOpt = document.createElement('option');
+        emptyOpt.textContent = "No se encontraron objetos visibles";
+        select.appendChild(emptyOpt);
+        return;
+      }
+
+      filtered.forEach(obj => {
+        const { alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
         const opt = document.createElement('option');
         opt.value = obj.id;
-        opt.textContent = `${obj.id} — ${obj.name ? obj.name : obj.con} (${alt > 0 ? '+' : ''}${alt.toFixed(0)}°)`;
+        const altSign = alt >= 0 ? `+${alt.toFixed(0)}°` : `${alt.toFixed(0)}°`;
+        opt.textContent = `${obj.id} — ${obj.name} [${altSign} Alt, ${obj.con}]`;
         select.appendChild(opt);
       });
 
-      if (prevSelected && Array.from(select.options).some(o => o.value === prevSelected)) {
-        select.value = prevSelected;
+      if (prevVal && filtered.some(o => o.id === prevVal)) {
+        select.value = prevVal;
       }
-      updateCalculations();
+
+      refreshTargetReadouts();
     }
 
-    function toggleOnlyVisible() {
-      onlyVisible = !onlyVisible;
-      const btn = document.getElementById('filter-btn');
-      btn.classList.toggle('active', onlyVisible);
-      btn.textContent = onlyVisible ? "Solo Visibles" : "Mostrar Todos";
-      populateSelect();
-    }
-
-    function updateCalculations() {
+    function refreshTargetReadouts() {
       const select = document.getElementById('object-select');
-      if (!select.value) return;
+      const targetId = select.value;
+      const obj = MESSIER_DATA.find(o => o.id === targetId);
 
-      const obj = MESSIER_DATA.find(o => o.id === select.value);
-      if (!obj) return;
+      if (!obj) {
+        document.getElementById('disp-tripod').textContent = "--°";
+        document.getElementById('disp-altitude').textContent = "--°";
+        return;
+      }
 
+      // Actualizar tarjeta meta del objeto
+      document.getElementById('meta-type').textContent = obj.type;
+      document.getElementById('meta-con').textContent = obj.con;
+      document.getElementById('meta-mag').textContent = `${obj.mag} mag`;
+
+      // Calcular Az y Alt en tiempo real
       const now = new Date();
       const lst = getLST(now, userLon);
       const { az, alt } = raDecToAltAz(obj.ra, obj.dec, userLat, lst);
 
-      currentAltTarget = alt;
+      // Resolver graduación del trípode
+      const trip = resolveTripodGraduation(az);
 
-      const tripod = formatTripodQuadrant(az);
-      document.getElementById('disp-tripod').textContent = tripod.dial;
-      document.getElementById('disp-sector').textContent = tripod.sector;
-      document.getElementById('disp-az').textContent = `${az.toFixed(1)}°`;
-      document.getElementById('disp-alt').textContent = `${alt.toFixed(1)}°`;
+      // Actualizar lecturas prominentes
+      document.getElementById('disp-tripod').textContent = `${trip.dial.toFixed(1)}°`;
+      document.getElementById('disp-direction-tag').textContent = trip.directionTag;
 
-      updateQuadrantGraphic(tripod.sectorNum);
-      checkAlignment();
+      const altPrefix = alt >= 0 ? "+" : "";
+      document.getElementById('disp-altitude').textContent = `${altPrefix}${alt.toFixed(1)}°`;
+      document.getElementById('disp-altitude-tag').textContent = alt >= 0 ? "Ajustar Inclinómetro" : "Bajo el Horizonte";
+
+      // Instrucciones directas
+      document.getElementById('banner-direction').innerHTML = trip.detailedBanner;
+
+      // HUD del SVG
+      document.getElementById('svg-hud-dial').textContent = `${trip.dial.toFixed(1)}°`;
+      document.getElementById('svg-hud-az').textContent = `${az.toFixed(1)}°`;
+
+      // Gráficos interactivos
+      renderSvgDial(trip.dial, trip.arrowDirection);
+      updateCompassWidget(trip.quad);
     }
 
-    function playBeep(freq, duration) {
-      if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {}
+    function onObjectSelected() {
+      refreshTargetReadouts();
     }
 
-    function checkAlignment() {
-      const banner = document.getElementById('banner-status');
-      if (currentAltTarget === null || currentSensorPitch === null) {
-        banner.textContent = "INCLINA EL TUBO";
-        banner.classList.remove('aligned');
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+      populateDropdown();
+    }
+
+    function toggleOnlyVisible() {
+      onlyVisible = !onlyVisible;
+      const chip = document.getElementById('chip-visible');
+      chip.classList.toggle('active', onlyVisible);
+      chip.textContent = onlyVisible ? "Solo Visibles" : "Todos los 110";
+      populateDropdown();
+    }
+
+    function toggleNightMode() {
+      const isNight = document.body.classList.toggle('night-red');
+      localStorage.setItem('messier_night_mode', isNight ? '1' : '0');
+      const btn = document.getElementById('btn-night');
+      btn.textContent = isNight ? "☀️ Modo Normal" : "🌙 Modo Rojo";
+    }
+
+    function requestGPS() {
+      const locText = document.getElementById('loc-text');
+      if (!navigator.geolocation) {
+        locText.textContent = "Geolocalización no soportada por el navegador.";
         return;
       }
 
-      const diff = Math.abs(currentSensorPitch - currentAltTarget);
-      const now = Date.now();
-
-      if (diff <= 1.0) {
-        banner.textContent = "¡EN EL BLANCO! (ALINEADO)";
-        banner.classList.add('aligned');
-        if (now - lastBeep > 250) {
-          playBeep(880, 0.15);
-          lastBeep = now;
-        }
-      } else {
-        banner.classList.remove('aligned');
-        if (currentSensorPitch < currentAltTarget) {
-          banner.textContent = `SUBE EL TUBO (+${(currentAltTarget - currentSensorPitch).toFixed(1)}°)`;
-        } else {
-          banner.textContent = `BAJA EL TUBO (-${(currentSensorPitch - currentAltTarget).toFixed(1)}°)`;
-        }
-
-        if (diff < 8.0 && now - lastBeep > (diff * 90 + 80)) {
-          playBeep(440, 0.05);
-          lastBeep = now;
-        }
-      }
-    }
-
-    function handleOrientation(event) {
-      let pitch = event.beta;
-      if (pitch !== null && pitch !== undefined) {
-        currentSensorPitch = pitch;
-        document.getElementById('disp-sensor').textContent = `${pitch.toFixed(1)}°`;
-        checkAlignment();
-      }
-    }
-
-    function startApp() {
-      const btn = document.getElementById('btn-activate');
-
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-          .then(permissionState => {
-            if (permissionState === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation, true);
-              btn.textContent = "Sensores y Audio Activos ✓";
-              btn.style.background = "#22c55e";
-            } else {
-              alert("Permiso de orientación denegado.");
-            }
-          })
-          .catch(err => {
-            alert("Error al solicitar sensor: " + err);
-          });
-      } else {
-        window.addEventListener('deviceorientation', handleOrientation, true);
-        btn.textContent = "Sensores y Audio Activos ✓";
-        btn.style.background = "#22c55e";
-      }
-
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-      } catch (e) {
-        console.warn("Audio no iniciado", e);
-      }
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
+      locText.textContent = "Obteniendo coordenadas GPS...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
           userLat = pos.coords.latitude;
           userLon = pos.coords.longitude;
-          document.getElementById('gps-status').textContent = 
-            `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (GPS Activo)`;
-          populateSelect();
-        }, () => {
-          document.getElementById('gps-status').textContent = 
-            `Lat: ${userLat.toFixed(2)}°, Lon: ${userLon.toFixed(2)}° (Ubicación fija)`;
-        });
-      }
+          locText.textContent = `GPS fijado: ${userLat.toFixed(2)}° Lat, ${userLon.toFixed(2)}° Lon`;
+          populateDropdown();
+        },
+        (err) => {
+          locText.textContent = `Ubicación manual: ${userLat.toFixed(2)}° Lat, ${userLon.toFixed(2)}° Lon`;
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
     }
 
-    populateSelect();
-    setInterval(updateCalculations, 4000);
+    window.addEventListener('DOMContentLoaded', () => {
+      // Cargar preferencia de modo noche
+      if (localStorage.getItem('messier_night_mode') === '1') {
+        document.body.classList.add('night-red');
+        document.getElementById('btn-night').textContent = "☀️ Modo Normal";
+      }
+
+      // Cargar lista inicial
+      populateDropdown();
+
+      // Autoiniciar detección GPS si está disponible
+      if (navigator.geolocation) {
+        requestGPS();
+      }
+
+      // Actualizar automáticamente cada 3 segundos el cálculo astronómico
+      setInterval(refreshTargetReadouts, 3000);
+    });
   </script>
 </body>
 </html>
